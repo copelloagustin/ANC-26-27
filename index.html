@@ -1062,7 +1062,7 @@
             const today = new Date();
             const dayNum = (today.getFullYear() === year && today.getMonth() === month)
                 ? Math.min(daysInMonth, today.getDate())
-                : daysInMonth;
+                : Math.min(daysInMonth, 15);
             const dateStr = `${monthKey}-${String(dayNum).padStart(2, '0')}`;
 
             return {
@@ -1081,7 +1081,12 @@
         }
 
         function syncCocoGoalTotalPaid() {
-            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
+            if (!state.cocoGoal) {
+                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
+            }
+            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
+                state.cocoGoal.paymentsByMonth = {};
+            }
             const totalPaid = Object.values(state.cocoGoal.paymentsByMonth).reduce((sum, v) => sum + Math.max(0, Number(v) || 0), 0);
             state.cocoGoal.paid = Math.round(totalPaid * 100) / 100;
         }
@@ -1611,20 +1616,24 @@
 
         function adjustCocoPaid(delta) {
             const monthKey = getCurrentMonthPrefix();
-            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
-            const currentMonthUsd = Math.max(0, Number(state.cocoGoal.paymentsByMonth[monthKey]) || 0);
-            const actualAppliedDelta = delta < 0 ? -Math.min(currentMonthUsd, Math.abs(delta)) : delta;
-
-            if (actualAppliedDelta === 0 && delta < 0) {
-                state.cocoGoal.paid = Math.max(0, (Number(state.cocoGoal.paid) || 0) + delta);
-            } else {
-                state.cocoGoal.paymentsByMonth[monthKey] = Math.max(0, currentMonthUsd + actualAppliedDelta);
-                syncCocoGoalTotalPaid();
+            if (!state.cocoGoal) {
+                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
             }
+            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
+                state.cocoGoal.paymentsByMonth = {};
+            }
+
+            const currentMonthUsd = Math.max(0, Number(state.cocoGoal.paymentsByMonth[monthKey]) || 0);
+            const nextMonthUsd = Math.max(0, Math.round((currentMonthUsd + delta) * 100) / 100);
+            state.cocoGoal.paymentsByMonth[monthKey] = nextMonthUsd;
+            syncCocoGoalTotalPaid();
+
+            const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+            const arsMonthTotal = Math.round(nextMonthUsd * usdRate);
 
             saveState();
             renderAll();
-            showToast(`Devolución a Cocó: ${formatUSD(state.cocoGoal.paid)} (restado del saldo del mes)`, 'success');
+            showToast(`Cocó este mes: ${formatUSD(nextMonthUsd)} (-${formatARS(arsMonthTotal)} descontados del saldo)`, 'success');
         }
 
         // =====================================================================
@@ -2408,22 +2417,29 @@
             // Guardar objetivo Cocó (y descontar diferencia en el saldo final del mes activo)
             document.getElementById('cocoForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const prevTotal = Math.max(0, Number(state.cocoGoal.paid) || 0);
-                const newTotal = Math.max(0, parseFloat(document.getElementById('cocoPaidInput').value) || 0);
-                const deltaUsd = newTotal - prevTotal;
+                if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
+                    state.cocoGoal.paymentsByMonth = {};
+                }
                 const monthKey = getCurrentMonthPrefix();
+                const otherMonthsPaid = Object.entries(state.cocoGoal.paymentsByMonth)
+                    .filter(([k]) => k !== monthKey)
+                    .reduce((sum, [, v]) => sum + Math.max(0, Number(v) || 0), 0);
+
+                const newTotal = Math.max(0, parseFloat(document.getElementById('cocoPaidInput').value) || 0);
+                const newMonthUsd = Math.max(0, Math.round((newTotal - otherMonthsPaid) * 100) / 100);
 
                 state.cocoGoal.title = document.getElementById('cocoTitleInput').value.trim() || 'Devolución a Cocó';
-                if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
-                const currentMonthPaid = Math.max(0, Number(state.cocoGoal.paymentsByMonth[monthKey]) || 0);
-                state.cocoGoal.paymentsByMonth[monthKey] = Math.max(0, currentMonthPaid + deltaUsd);
-                state.cocoGoal.paid = newTotal;
+                state.cocoGoal.paymentsByMonth[monthKey] = newMonthUsd;
+                syncCocoGoalTotalPaid();
                 state.cocoGoal.target = Math.max(1, parseFloat(document.getElementById('cocoTargetInput').value) || 2500);
+
+                const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+                const arsMonthTotal = Math.round(newMonthUsd * usdRate);
 
                 saveState();
                 closeCocoModal();
                 renderAll();
-                showToast('Objetivo Cocó y saldo final del mes actualizados', 'success');
+                showToast(`Cocó actualizado: -${formatARS(arsMonthTotal)} descontados en este mes`, 'success');
             });
 
             // Agregar nuevo préstamo
