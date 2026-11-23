@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión-ANC'26/27 — Finanzas Personales & Calendario</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        zinc: {
+                            950: '#090b0f',
+                            900: '#11151c',
+                            850: '#171c26',
+                            800: '#232a38',
+                            700: '#374151',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #090b0f;
+            color: #f4f4f5;
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #11151c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-indigo-500/30 selection:text-indigo-200 pb-12">
+
+    <!-- ===================================================================== -->
+    <!-- TOP NAVBAR & MONTH NAVIGATION                                         -->
+    <!-- ===================================================================== -->
+    <header class="sticky top-0 z-30 bg-zinc-950/85 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-white">Gestión-ANC'26/27</h1>
+                    </div>
+                    <p class="text-xs text-zinc-400">Control personal, saldos manuales y calendario</p>
+                </div>
+            </div>
+
+            <!-- Month Selector -->
+            <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl p-1">
+                <button type="button" id="prevMonthBtn" class="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Mes anterior">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <div class="px-3 py-1 min-w-[155px] text-center">
+                    <span id="currentMonthLabel" class="text-sm font-semibold text-white capitalize">Noviembre 2026</span>
+                </div>
+                <button type="button" id="nextMonthBtn" class="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Mes siguiente">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="openCategoriesModal()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 flex items-center gap-1.5 transition-colors">
+                    <i data-lucide="tags" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="hidden sm:inline">Categorías</span>
+                </button>
+                <button type="button" onclick="exportBackupJSON()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 flex items-center gap-1.5 transition-colors" title="Exportar respaldo JSON">
+                    <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="hidden md:inline">Exportar</span>
+                </button>
+                <label class="cursor-pointer px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 flex items-center gap-1.5 transition-colors" title="Importar respaldo JSON">
+                    <i data-lucide="upload" class="w-3.5 h-3.5 text-amber-400"></i>
+                    <span class="hidden md:inline">Importar</span>
+                    <input type="file" id="importJsonInput" accept=".json" class="hidden">
+                </label>
+                <button type="button" onclick="confirmResetSheetData()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-rose-950/60 border border-zinc-800 hover:border-rose-500/40 text-xs font-medium text-zinc-400 hover:text-rose-300 flex items-center gap-1.5 transition-colors" title="Restaurar datos base de la planilla">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+        <!-- ================================================================= -->
+        <!-- 1. KPI CARDS DEL MES (FLUJO DEL CALENDARIO)                       -->
+        <!-- ================================================================= -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Ingresos del Mes -->
+            <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-zinc-400">Ingresos del Mes</span>
+                    <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="kpiIncomeTotal" class="text-2xl font-bold font-mono tabular-nums text-emerald-400">$ 0</div>
+                <p id="kpiIncomeBreakdown" class="text-xs text-zinc-500 mt-1">Cobrado: $ 0 · Pendiente: $ 0</p>
+            </div>
+
+            <!-- Egresos del Mes -->
+            <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-zinc-400">Egresos & Vencimientos</span>
+                    <span class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                        <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="kpiExpenseTotal" class="text-2xl font-bold font-mono tabular-nums text-rose-400">$ 0</div>
+                <p id="kpiExpenseBreakdown" class="text-xs text-zinc-500 mt-1">Pagado: $ 0 · Pendiente: $ 0</p>
+            </div>
+
+            <!-- Saldo Real Actual del Mes -->
+            <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-zinc-400">Balance Real (Efectivizado)</span>
+                    <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="kpiRealBalance" class="text-2xl font-bold font-mono tabular-nums text-white">$ 0</div>
+                <p class="text-xs text-zinc-500 mt-1">Solo movimientos ya cobrados/pagados</p>
+            </div>
+
+            <!-- Saldo Proyectado Cierre de Mes -->
+            <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-zinc-400">Proyección Cierre de Mes</span>
+                    <span class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="kpiProjectedBalance" class="text-2xl font-bold font-mono tabular-nums text-amber-300">$ 0</div>
+                <p class="text-xs text-zinc-500 mt-1">Incluye vencimientos pendientes del mes</p>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 2. SALDOS MANUALES (CUENTA, USDT, 4 TARJETAS) + META COCÓ 2500 USD -->
+        <!-- ================================================================= -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Panel Izquierdo (7 cols): Liquidez Manual + 4 Tarjetas Disponibles -->
+            <div class="lg:col-span-7 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800/80 pb-3.5">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-indigo-400"></i>
+                            Saldos Disponibles Manuales
+                        </h2>
+                        <p class="text-xs text-zinc-400">Editables a mano. Cada tarjeta calcula: (Límite − Disponible) + Taxes y vence el 4to día hábil del mes siguiente.</p>
+                    </div>
+                    <span class="text-[11px] px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/70">Clic para editar</span>
+                </div>
+
+                <!-- Cuenta Bancaria + USDT -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5" id="liquidityBarsContainer">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- 4 Barritas de Saldo DISPONIBLE en Tarjetas -->
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Saldo Disponible en Tarjetas (4)</span>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1 bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-0.5 text-[11px]">
+                                <span class="text-zinc-400">Taxes est.:</span>
+                                <button type="button" onclick="setGlobalCardTax(5)" id="taxPreset5Btn" class="px-1.5 py-0.5 rounded font-mono text-zinc-400 hover:text-white">5%</button>
+                                <button type="button" onclick="setGlobalCardTax(7.5)" id="taxPreset75Btn" class="px-1.5 py-0.5 rounded font-mono text-zinc-400 hover:text-white">7.5%</button>
+                                <button type="button" onclick="setGlobalCardTax(10)" id="taxPreset10Btn" class="px-1.5 py-0.5 rounded font-mono text-zinc-400 hover:text-white">10%</button>
+                            </div>
+                            <span id="totalCardsAvailableLabel" class="text-xs font-mono text-zinc-300">Total disp: $ 0</span>
+                        </div>
+                    </div>
+                    <div id="creditCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Rendered dynamically -->
+                    </div>
+
+                    <!-- Resumen Automático Estimado Mes Siguiente por Saldo Utilizado + Taxes -->
+                    <div id="nextMonthCardsEstimateStrip" class="mt-3.5 p-3.5 rounded-xl bg-zinc-950/90 border border-indigo-500/25 space-y-2">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Derecho (5 cols): Única Barra de Ahorro (Cocó USD 2.500) + Hoja de Ruta -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <!-- Única Meta: Devolución USD 2.500 a Cocó -->
+                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                    <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+                                </span>
+                                <div>
+                                    <h2 id="cocoGoalTitle" class="text-base font-bold text-white">Devolución a Cocó</h2>
+                                    <p class="text-xs text-zinc-400">Objetivo único en dólares (USD)</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="openCocoModal()" class="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors" title="Editar meta y monto">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Números principales -->
+                        <div class="flex items-baseline justify-between mt-4 mb-2">
+                            <div>
+                                <span class="text-xs text-zinc-400 block">Devuelto hasta hoy</span>
+                                <span id="cocoPaidDisplay" class="text-2xl font-bold font-mono tabular-nums text-emerald-400">USD 0</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-zinc-400 block">Meta total</span>
+                                <span id="cocoTargetDisplay" class="text-base font-semibold font-mono tabular-nums text-zinc-200">USD 2.500</span>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progreso -->
+                        <div class="w-full h-3.5 bg-zinc-950 border border-zinc-800 rounded-full overflow-hidden p-0.5">
+                            <div id="cocoProgressBar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width: 0%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-zinc-400 mt-2">
+                            <span id="cocoPercentLabel" class="font-mono font-medium text-emerald-400">0% completado</span>
+                            <span id="cocoRemainingLabel" class="font-mono">Restan: USD 2.500</span>
+                        </div>
+                    </div>
+
+                    <!-- Botones rápidos de ajuste manual -->
+                    <div class="mt-4 pt-3.5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs text-zinc-400">Ajuste rápido:</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="adjustCocoAmount(-50)" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-rose-950/70 border border-zinc-700 hover:border-rose-500/40 text-xs font-mono text-zinc-300 hover:text-rose-300 transition-colors">-50</button>
+                            <button type="button" onclick="adjustCocoAmount(50)" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-emerald-950/70 border border-zinc-700 hover:border-emerald-500/40 text-xs font-mono text-emerald-300 transition-colors">+50 USD</button>
+                            <button type="button" onclick="adjustCocoAmount(100)" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-mono font-semibold text-white transition-colors">+100 USD</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hoja de Ruta de Saneamiento (Referencia de tu Planilla) -->
+                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl flex-1 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i data-lucide="milestone" class="w-4 h-4 text-amber-400"></i>
+                                Hoja de Ruta — Préstamos, Tarjetas & Cocó
+                            </h3>
+                            <p class="text-[11px] text-zinc-400">Préstamos calculados por cuota/mes · Tarjetas según barritas</p>
+                        </div>
+                        <button type="button" onclick="openLoansConfigModal()" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[11px] font-medium text-amber-300 flex items-center gap-1 transition-colors">
+                            <i data-lucide="settings-2" class="w-3 h-3"></i>
+                            Config. Préstamos
+                        </button>
+                    </div>
+
+                    <!-- Tarjetas resumen de estado de préstamos (Cuota actual / Saldo restante) -->
+                    <div id="loansStatusSummary" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- Rendered dynamically -->
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead id="roadmapTableHead">
+                                <!-- Rendered dynamically -->
+                            </thead>
+                            <tbody id="roadmapTableBody" class="divide-y divide-zinc-800/60 font-mono tabular-nums text-[11px]">
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                            <tfoot id="roadmapTableFooter" class="border-t border-zinc-700/80 font-mono tabular-nums text-[11px] bg-zinc-950/60">
+                                <!-- Rendered dynamically -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 3. CALENDARIO INTERACTIVO + VENCIMIENTOS DEL MES Y GRÁFICO        -->
+        <!-- ================================================================= -->
+        <section class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+            <!-- Calendario Mensual (8 cols) -->
+            <div class="xl:col-span-8 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-6 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="calendar-days" class="w-5 h-5 text-indigo-400"></i>
+                            Calendario de Ingresos y Vencimientos
+                        </h2>
+                        <p class="text-xs text-zinc-400">Hacé clic en cualquier día para agregar, editar o marcar cobros y pagos.</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="flex items-center gap-1.5 text-zinc-300"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Ingreso</span>
+                        <span class="flex items-center gap-1.5 text-zinc-300"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>Egreso</span>
+                        <span class="flex items-center gap-1.5 text-zinc-300"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>Pendiente</span>
+                    </div>
+                </div>
+
+                <!-- Días de la semana (Lunes a Domingo) -->
+                <div class="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2 text-center">
+                    <div class="text-xs font-semibold text-zinc-400 py-1">Lun</div>
+                    <div class="text-xs font-semibold text-zinc-400 py-1">Mar</div>
+                    <div class="text-xs font-semibold text-zinc-400 py-1">Mié</div>
+                    <div class="text-xs font-semibold text-zinc-400 py-1">Jue</div>
+                    <div class="text-xs font-semibold text-zinc-400 py-1">Vie</div>
+                    <div class="text-xs font-semibold text-zinc-500 py-1">Sáb</div>
+                    <div class="text-xs font-semibold text-zinc-500 py-1">Dom</div>
+                </div>
+
+                <!-- Grilla de días -->
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Columna Lateral (4 cols): Movimientos del Mes + Gráfico -->
+            <div class="xl:col-span-4 flex flex-col gap-6">
+                <!-- Lista cronológica de movimientos del mes -->
+                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl flex flex-col max-h-[480px]">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i data-lucide="list-checks" class="w-4 h-4 text-indigo-400"></i>
+                            Movimientos del Mes
+                        </h3>
+                        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800 text-[11px]">
+                            <button type="button" id="filterAllBtn" onclick="setListFilter('all')" class="px-2 py-0.5 rounded bg-zinc-800 text-white font-medium">Todos</button>
+                            <button type="button" id="filterPendingBtn" onclick="setListFilter('pending')" class="px-2 py-0.5 rounded text-zinc-400 hover:text-white">Pendientes</button>
+                        </div>
+                    </div>
+
+                    <div id="monthMovementsList" class="space-y-2 overflow-y-auto pr-1 flex-1">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Gráfico Analítico del Mes -->
+                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i>
+                            Flujo Diario del Mes
+                        </h3>
+                        <span class="text-[11px] text-zinc-400">Acumulado ARS</span>
+                    </div>
+                    <div class="relative h-52 w-full">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: CONFIGURACIÓN DE PRÉSTAMOS (EDITAR / AGREGAR / ELIMINAR)       -->
+    <!-- ===================================================================== -->
+    <div id="loansConfigModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] uppercase tracking-wider text-amber-400 font-semibold">Gestión de Préstamos en Hoja de Ruta</span>
+                    <h3 class="text-base font-bold text-white">Editar, Agregar o Eliminar Préstamos</h3>
+                </div>
+                <button type="button" onclick="closeLoansConfigModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-4 max-h-[82vh] overflow-y-auto">
+                <div id="loansEditorList" class="space-y-3">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Agregar nuevo préstamo -->
+                <form id="addLoanForm" class="p-3.5 rounded-xl bg-zinc-950 border border-dashed border-zinc-700 space-y-2.5">
+                    <div class="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        Agregar Nuevo Préstamo a la Hoja de Ruta
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <input type="text" id="newLoanName" placeholder="Nombre (ej: Hipotecario)" required
+                            class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
+                        <input type="number" id="newLoanDicInstallment" min="1" max="120" placeholder="Cuota en Dic" required
+                            class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                        <input type="number" id="newLoanTotal" min="1" max="120" placeholder="Total cuotas" required
+                            class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                        <input type="number" id="newLoanAmount" min="0" step="any" placeholder="Valor cuota ($)" required
+                            class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">
+                            + Agregar Préstamo
+                        </button>
+                    </div>
+                </form>
+
+                <div class="pt-1 flex justify-end gap-2">
+                    <button type="button" onclick="closeLoansConfigModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300">Cerrar</button>
+                    <button type="button" onclick="saveLoansFromModal()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: EDITAR FILA HOJA DE RUTA (TARJETAS MANUALES / COCÓ / NETO)     -->
+    <!-- ===================================================================== -->
+    <div id="roadmapModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] uppercase tracking-wider text-amber-400 font-semibold">Ajuste Mensual Hoja de Ruta</span>
+                    <h3 id="roadmapModalTitle" class="text-base font-bold text-white">Editar Mes</h3>
+                </div>
+                <button type="button" onclick="closeRoadmapModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form id="roadmapForm" class="p-4 sm:p-5 space-y-3.5">
+                <input type="hidden" id="rmIndex">
+
+                <div id="rmLoansBreakdown" class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs space-y-1">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">Base Tarjetas Financiadas del Mes (ARS $)</label>
+                    <input type="number" id="rmTarjetas" min="0" step="any" required
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500">
+                    <p class="text-[10px] text-zinc-500 mt-1">Se suma automáticamente al consumo calculado de las 4 barritas de tarjetas.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Saldo Deuda Cocó (ARS $)</label>
+                        <input type="number" id="rmCoco" min="0" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Dinero Neto Acum. (ARS $)</label>
+                        <input type="number" id="rmNeto" min="0" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeRoadmapModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white transition-colors">Guardar Mes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: EDITAR SALDO MANUAL (CUENTA, USDT O TARJETA)                   -->
+    <!-- ===================================================================== -->
+    <div id="manualBarModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <h3 id="manualBarModalTitle" class="text-base font-bold text-white">Editar Saldo Manual</h3>
+                <button type="button" onclick="closeManualBarModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form id="manualBarForm" class="p-4 sm:p-5 space-y-4">
+                <input type="hidden" id="mbType">
+                <input type="hidden" id="mbId">
+
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">Nombre / Etiqueta</label>
+                    <input type="text" id="mbName" required
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label id="mbAmountLabel" class="block text-xs text-zinc-400 mb-1">Saldo Disponible Actual</label>
+                        <input type="number" id="mbAmount" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label id="mbLimitLabel" class="block text-xs text-zinc-400 mb-1">Límite / Referencia</label>
+                        <input type="number" id="mbLimit" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div id="mbCardExtraGroup" class="hidden space-y-3 pt-2 border-t border-zinc-800">
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">% Taxes / Impuestos Sellos e IVA Estimado</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="mbTaxRate" min="0" max="50" step="0.5"
+                                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-indigo-500">
+                            <button type="button" onclick="document.getElementById('mbTaxRate').value=5; updateCardModalPreview();" class="px-2.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">5%</button>
+                            <button type="button" onclick="document.getElementById('mbTaxRate').value=7.5; updateCardModalPreview();" class="px-2.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">7.5%</button>
+                            <button type="button" onclick="document.getElementById('mbTaxRate').value=10; updateCardModalPreview();" class="px-2.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">10%</button>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-1.5 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-400">Saldo Utilizado (Límite − Disponible):</span>
+                            <span id="mbPreviewUsed" class="font-mono text-zinc-200">$ 0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-400">Taxes estimados (<span id="mbPreviewTaxPct">7.5</span>%):</span>
+                            <span id="mbPreviewTaxAmt" class="font-mono text-zinc-300">$ 0</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-1 border-t border-zinc-800/80">
+                            <span class="text-zinc-300 font-medium">Estimado Vto. Próx. Mes (4to día hábil):</span>
+                            <span id="mbPreviewConsumed" class="font-mono text-amber-400 font-semibold">$ 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeManualBarModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: EDITAR META COCÓ (USD 2.500)                                   -->
+    <!-- ===================================================================== -->
+    <div id="cocoModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Editar Devolución a Cocó</h3>
+                <button type="button" onclick="closeCocoModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form id="cocoForm" class="p-4 sm:p-5 space-y-4">
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">Título de la Meta</label>
+                    <input type="text" id="cocoTitleInput" required
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Ya Devuelto (USD)</label>
+                        <input type="number" id="cocoPaidInput" min="0" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Meta Total (USD)</label>
+                        <input type="number" id="cocoTargetInput" min="1" step="any" required
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeCocoModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Guardar Meta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: CATEGORÍAS                                                     -->
+    <!-- ===================================================================== -->
+    <div id="categoriesModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Categorías</h3>
+                <button type="button" onclick="closeCategoriesModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-4">
+                <form id="newCategoryForm" class="flex items-center gap-2">
+                    <input type="color" id="newCatColor" value="#6366f1" class="w-10 h-9 rounded-lg bg-zinc-950 border border-zinc-800 cursor-pointer">
+                    <input type="text" id="newCatName" placeholder="Nueva categoría..." required
+                        class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white">Agregar</button>
+                </form>
+                <div id="categoriesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: DETALLE DEL DÍA Y FORMULARIO DE MOVIMIENTO                     -->
+    <!-- ===================================================================== -->
+    <div id="dayModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] uppercase tracking-wider text-indigo-400 font-semibold">Detalle Diario</span>
+                    <h3 id="dayModalTitle" class="text-base font-bold text-white capitalize">Fecha</h3>
+                </div>
+                <button type="button" onclick="closeDayModal()" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto">
+                <div id="dayTransactionsList" class="space-y-2"></div>
+
+                <form id="txForm" class="pt-3 border-t border-zinc-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 id="txFormTitle" class="text-xs font-bold uppercase tracking-wider text-zinc-300">Nuevo Movimiento</h4>
+                        <button type="button" id="cancelEditTxBtn" onclick="resetTxForm()" class="hidden text-xs text-zinc-400 hover:text-white">Cancelar edición</button>
+                    </div>
+
+                    <input type="hidden" id="txId">
+                    <input type="hidden" id="txDate">
+                    <input type="hidden" id="txType" value="expense">
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="typeIncomeBtn" onclick="setTxType('income')" class="py-2 rounded-xl text-xs font-semibold border transition-all bg-zinc-900 text-zinc-400 border-zinc-800">+ Ingreso</button>
+                        <button type="button" id="typeExpenseBtn" onclick="setTxType('expense')" class="py-2 rounded-xl text-xs font-semibold border transition-all bg-rose-500/15 text-rose-300 border-rose-500/40">- Egreso / Vto.</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">Concepto</label>
+                            <input type="text" id="txTitle" placeholder="Ej: Sueldo, Préstamo..." required
+                                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">Monto (ARS $)</label>
+                            <input type="number" id="txAmount" min="1" step="any" placeholder="0" required
+                                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">Categoría</label>
+                            <select id="txCategory" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">Estado</label>
+                            <select id="txStatus" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                <option value="pending">Pendiente / A vencer</option>
+                                <option value="completed">Efectivizado / Pago</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Nota (opcional)</label>
+                        <input type="text" id="txNote" placeholder="Detalle o referencia..."
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div id="recurrenceWrapper" class="flex items-center gap-2">
+                        <input type="checkbox" id="txRecurring" class="rounded bg-zinc-950 border-zinc-700 text-indigo-500">
+                        <label for="txRecurring" class="text-xs text-zinc-400">Repetir mensualmente (próximos 6 meses)</label>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors">Guardar Movimiento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TOAST NOTIFICATION                                                    -->
+    <!-- ===================================================================== -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
+    <!-- ===================================================================== -->
+    <script>
+        const STORAGE_KEY = 'finflow_v6_agustin';
+        const LEGACY_STORAGE_KEYS = ['finflow_v5_agustin', 'finflow_v4_agustin', 'finflow_v3_agustin', 'finflow_v2_agustin'];
+
+        // Feriados nacionales de Argentina (2026 - 2027) para el cálculo exacto del 4to día hábil
+        const ARGENTINA_HOLIDAYS = new Set([
+            // 2026
+            '2026-01-01', '2026-02-16', '2026-02-17', '2026-03-24', '2026-04-02', '2026-04-03',
+            '2026-05-01', '2026-05-25', '2026-06-15', '2026-06-20', '2026-07-09', '2026-08-17',
+            '2026-10-12', '2026-11-23', '2026-12-08', '2026-12-25',
+            // 2027
+            '2027-01-01', '2027-02-08', '2027-02-09', '2027-03-24', '2027-03-26', '2027-04-02',
+            '2027-05-01', '2027-05-25', '2027-06-17', '2027-06-20', '2027-07-09', '2027-08-16',
+            '2027-10-11', '2027-11-22', '2027-12-08', '2027-12-25'
+        ]);
+
+        const DEFAULT_CARDS_LIST = [
+            { id: 'card_amex', name: 'Galicia AMEX', available: 2500000, limit: 2500000, taxRate: 7.5 },
+            { id: 'card_master', name: 'Galicia Master', available: 2500000, limit: 2500000, taxRate: 7.5 },
+            { id: 'card_naranja', name: 'Naranja X', available: 375000, limit: 375000, taxRate: 7.5 },
+            { id: 'card_carrefour', name: 'Carrefour Banco', available: 1025000, limit: 1025000, taxRate: 7.5 }
+        ];
+
+        const DEFAULT_CATEGORIES = [
+            { id: 'cat_sueldo', name: 'Sueldo & Aguinaldo', color: '#10b981' },
+            { id: 'cat_comisiones', name: 'Comisiones & Extras', color: '#14b8a6' },
+            { id: 'cat_cuenta', name: 'Saldo / Reserva Cuenta', color: '#3b82f6' },
+            { id: 'cat_prestamos', name: 'Préstamos (Galicia / NX / Moni)', color: '#f43f5e' },
+            { id: 'cat_tarjetas', name: 'Tarjetas de Crédito', color: '#f59e0b' },
+            { id: 'cat_coco', name: 'Deuda Cocó', color: '#8b5cf6' },
+            { id: 'cat_otros', name: 'Otros', color: '#71717a' }
+        ];
+
+        // Configuración por cuota de préstamos (editable y eliminable):
+        // En Diciembre 2026 se paga la cuota 4/12 de Galicia y la cuota 2/12 de Naranja X.
+        // Sin precancelación activa por defecto.
+        const DEFAULT_LOANS_LIST = [
+            {
+                id: 'loan_galicia',
+                name: 'Galicia',
+                colorClass: 'text-sky-300',
+                borderClass: 'border-sky-500/30',
+                baseMonthKey: '2026-12',
+                installmentPaidInBaseMonth: 4,
+                totalInstallments: 12,
+                installmentAmount: 263000
+            },
+            {
+                id: 'loan_naranja',
+                name: 'Naranja X',
+                colorClass: 'text-rose-300',
+                borderClass: 'border-rose-500/30',
+                baseMonthKey: '2026-12',
+                installmentPaidInBaseMonth: 2,
+                totalInstallments: 12,
+                installmentAmount: 125000
+            }
+        ];
+
+        // Plan base de tarjetas financiadas históricas (Dic-Feb) + Cocó + Neto;
+        // El consumo activo de las 4 barritas de tarjetas se suma automáticamente mes a mes.
+        const DEFAULT_ROADMAP_PLAN = [
+            { monthKey: '2026-12', mes: 'Dic 26', tarjetasBase: 2143077, coco: 3840000, neto: 0 },
+            { monthKey: '2027-01', mes: 'Ene 27', tarjetasBase: 1145185, coco: 3680000, neto: 0 },
+            { monthKey: '2027-02', mes: 'Feb 27', tarjetasBase: 267504, coco: 3520000, neto: 0 },
+            { monthKey: '2027-03', mes: 'Mar 27', tarjetasBase: 0, coco: 3200000, neto: 474496 },
+            { monthKey: '2027-04', mes: 'Abr 27', tarjetasBase: 0, coco: 2720000, neto: 631496 },
+            { monthKey: '2027-05', mes: 'May 27', tarjetasBase: 0, coco: 1920000, neto: 1018496 },
+            { monthKey: '2027-06', mes: 'Jun 27', tarjetasBase: 0, coco: 0, neto: 985496 }
+        ];
+
+        let state = {
+            currentYear: 2026,
+            currentMonth: 10, // 0-indexed: 10 = Noviembre 2026
+            categories: [...DEFAULT_CATEGORIES],
+            liquidity: {
+                bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, reference: 2500000, currency: 'ARS' },
+                usdt: { name: 'Saldo en USDT', amount: 0, reference: 2500, currency: 'USD' }
+            },
+            cards: DEFAULT_CARDS_LIST.map(c => ({ ...c })),
+            cocoGoal: {
+                title: 'Devolución a Cocó',
+                paid: 0,
+                target: 2500
+            },
+            loans: DEFAULT_LOANS_LIST.map(l => ({ ...l })),
+            roadmapPlan: DEFAULT_ROADMAP_PLAN.map(r => ({ ...r })),
+            transactions: []
+        };
+
+        let listFilter = 'all';
+        let cashflowChartInstance = null;
+
+        // =========================================================================
+        // INITIALIZATION & NORMALIZATION
+        // =========================================================================
+        function initApp() {
+            let saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) {
+                for (const legacyKey of LEGACY_STORAGE_KEYS) {
+                    const legacyData = localStorage.getItem(legacyKey);
+                    if (legacyData) {
+                        saved = legacyData;
+                        break;
+                    }
+                }
+            }
+
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                    normalizeCardsState();
+                    normalizeLoansAndRoadmapState();
+                    saveState();
+                } catch (e) {
+                    loadSheet2026Data(false);
+                }
+            } else {
+                loadSheet2026Data(false);
+            }
+
+            setupEventListeners();
+            renderAll();
+        }
+
+        function normalizeCardsState() {
+            if (!Array.isArray(state.cards) || state.cards.length === 0) {
+                state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
+                return;
+            }
+            // Migrar nombres y límites si aún tienen las tarjetas de ejemplo viejas
+            const hasLegacyMP = state.cards.some(c => (c.name || '').includes('MercadoPago') || (c.name || '').includes('Tarjeta 1'));
+            if (hasLegacyMP) {
+                state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
+                return;
+            }
+            state.cards = state.cards.map((card, idx) => {
+                const def = DEFAULT_CARDS_LIST[idx] || { limit: 1000000, taxRate: 7.5 };
+                const lim = Number(card.limit) || def.limit;
+                const avail = card.available !== undefined ? Math.max(0, Number(card.available) || 0) : lim;
+                const taxRate = card.taxRate !== undefined ? Math.max(0, Number(card.taxRate) || 0) : 7.5;
+                return {
+                    ...card,
+                    available: avail,
+                    limit: lim,
+                    taxRate
+                };
+            });
+        }
+
+        function normalizeLoansAndRoadmapState() {
+            if (!Array.isArray(state.loans)) {
+                state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
+            } else {
+                state.loans = state.loans.map((loan, idx) => ({
+                    id: loan.id || `loan_${Date.now()}_${idx}`,
+                    name: loan.name || `Préstamo ${idx + 1}`,
+                    colorClass: loan.colorClass || (idx % 2 === 0 ? 'text-sky-300' : 'text-rose-300'),
+                    borderClass: loan.borderClass || (idx % 2 === 0 ? 'border-sky-500/30' : 'border-rose-500/30'),
+                    baseMonthKey: loan.baseMonthKey || '2026-12',
+                    installmentPaidInBaseMonth: Math.max(0, parseInt(loan.installmentPaidInBaseMonth, 10) || 1),
+                    totalInstallments: Math.max(1, parseInt(loan.totalInstallments, 10) || 12),
+                    installmentAmount: Math.max(0, Number(loan.installmentAmount) || 0)
+                }));
+            }
+
+            if (!Array.isArray(state.roadmapPlan) || state.roadmapPlan.length === 0) {
+                state.roadmapPlan = DEFAULT_ROADMAP_PLAN.map(r => ({ ...r }));
+                return;
+            }
+            state.roadmapPlan = state.roadmapPlan.map((row, idx) => {
+                const def = DEFAULT_ROADMAP_PLAN[idx] || { monthKey: `2027-0${idx}`, mes: row.mes || `Mes ${idx + 1}`, tarjetasBase: 0, coco: 0, neto: 0 };
+                const tarjetasVal = row.tarjetasBase !== undefined ? Number(row.tarjetasBase) : (row.tarjetas !== undefined ? Number(row.tarjetas) : def.tarjetasBase);
+                return {
+                    monthKey: row.monthKey || def.monthKey,
+                    mes: row.mes || def.mes,
+                    tarjetasBase: Number(tarjetasVal) || 0,
+                    coco: row.coco !== undefined ? Number(row.coco) || 0 : def.coco,
+                    neto: row.neto !== undefined ? Number(row.neto) || 0 : def.neto
+                };
+            });
+        }
+
+        function loadSheet2026Data(notify = true) {
+            state.currentYear = 2026;
+            state.currentMonth = 10; // Noviembre 2026
+            state.categories = [...DEFAULT_CATEGORIES];
+            state.liquidity = {
+                bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, reference: 2500000, currency: 'ARS' },
+                usdt: { name: 'Saldo en USDT', amount: 0, reference: 2500, currency: 'USD' }
+            };
+            state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
+            state.cocoGoal = {
+                title: 'Devolución a Cocó',
+                paid: 0,
+                target: 2500
+            };
+            state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
+            state.roadmapPlan = DEFAULT_ROADMAP_PLAN.map(r => ({ ...r }));
+
+            state.transactions = [
+                // NOVIEMBRE 2026
+                { id: 'tx_1', date: '2026-11-19', type: 'income', title: 'Dinero en Cuenta (Base)', amount: 1800000, category: 'cat_cuenta', status: 'completed', note: 'Saldo inicial planilla 19/11' },
+                { id: 'tx_2', date: '2026-11-19', type: 'expense', title: 'Préstamo MONI', amount: 200000, category: 'cat_prestamos', status: 'completed', note: 'PAGO 19/11' },
+                { id: 'tx_3', date: '2026-11-20', type: 'income', title: 'Regalo Lela', amount: 170000, category: 'cat_otros', status: 'completed', note: 'Ingreso 20/11' },
+                { id: 'tx_4', date: '2026-11-27', type: 'income', title: 'Ingreso OWA', amount: 250000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 27/11' },
+
+                // DICIEMBRE 2026 (Cuota 4/12 Galicia + Cuota 2/12 Naranja X)
+                { id: 'tx_5', date: '2026-12-04', type: 'income', title: 'Sueldo Global Dic', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/12' },
+                { id: 'tx_5b', date: '2026-12-09', type: 'expense', title: 'Préstamo Galicia (Cuota 4/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Vencimiento Diciembre' },
+                { id: 'tx_6', date: '2026-12-10', type: 'expense', title: 'Vencimiento Tarjetas Dic (Rulo)', amount: 2143077, category: 'cat_tarjetas', status: 'pending', note: 'Deuda tarjetas planilla Dic' },
+                { id: 'tx_6b', date: '2026-12-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 2/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Vencimiento Diciembre' },
+                { id: 'tx_7', date: '2026-12-24', type: 'income', title: 'Aguinaldo Dic', amount: 700000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 24/12' },
+                { id: 'tx_8', date: '2026-12-24', type: 'income', title: 'Comisiones Global Dic', amount: 300000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 24/12' },
+
+                // ENERO 2027 (Cuota 5/12 Galicia + Cuota 3/12 Naranja X)
+                { id: 'tx_9', date: '2027-01-04', type: 'income', title: 'Sueldo Global Enero', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/01' },
+                { id: 'tx_10', date: '2027-01-09', type: 'expense', title: 'Préstamo Galicia (Cuota 5/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Primer quincena · Al día' },
+                { id: 'tx_10b', date: '2027-01-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 3/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_11', date: '2027-01-15', type: 'expense', title: 'Arrastre Saldo Tarjeta Ene', amount: 1145185, category: 'cat_tarjetas', status: 'pending', note: 'Saldo financiado proyectado' },
+                { id: 'tx_12', date: '2027-01-20', type: 'income', title: 'Comisiones Global Enero', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/01' },
+
+                // FEBRERO 2027 (Cuota 6/12 Galicia + Cuota 4/12 Naranja X)
+                { id: 'tx_13', date: '2027-02-04', type: 'income', title: 'Sueldo Global Febrero', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/02' },
+                { id: 'tx_14', date: '2027-02-09', type: 'expense', title: 'Préstamo Galicia (Cuota 6/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Primer quincena · Al día' },
+                { id: 'tx_14b', date: '2027-02-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 4/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_15', date: '2027-02-15', type: 'expense', title: 'Arrastre Residual Tarjeta Feb', amount: 267504, category: 'cat_tarjetas', status: 'pending', note: 'Saldo final financiado' },
+                { id: 'tx_16', date: '2027-02-20', type: 'income', title: 'Comisiones Global Febrero', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/02' },
+
+                // MARZO 2027 (Cuota 7/12 Galicia + Cuota 5/12 Naranja X)
+                { id: 'tx_17', date: '2027-03-04', type: 'income', title: 'Sueldo Global Marzo', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/03' },
+                { id: 'tx_18', date: '2027-03-09', type: 'expense', title: 'Préstamo Galicia (Cuota 7/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Primer quincena · Al día' },
+                { id: 'tx_18b', date: '2027-03-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 5/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_19', date: '2027-03-20', type: 'income', title: 'Comisiones Global Marzo', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/03' },
+
+                // ABRIL 2027 (Cuota 8/12 Galicia + Cuota 6/12 Naranja X — sin precancelar)
+                { id: 'tx_20', date: '2027-04-01', type: 'income', title: 'Dinero en Cuenta (Excedente Mar)', amount: 474496, category: 'cat_cuenta', status: 'pending', note: 'Arrastre positivo Marzo' },
+                { id: 'tx_21', date: '2027-04-04', type: 'income', title: 'Sueldo Global Abril', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/04' },
+                { id: 'tx_22', date: '2027-04-09', type: 'expense', title: 'Préstamo Galicia (Cuota 8/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Primer quincena · Al día' },
+                { id: 'tx_23', date: '2027-04-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 6/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_24', date: '2027-04-20', type: 'income', title: 'Comisiones Global Abril', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/04' },
+
+                // MAYO 2027 (Cuota 9/12 Galicia + Cuota 7/12 Naranja X)
+                { id: 'tx_25', date: '2027-05-01', type: 'income', title: 'Dinero en Cuenta (Reserva Abr)', amount: 631496, category: 'cat_cuenta', status: 'pending', note: 'Arrastre positivo Abril' },
+                { id: 'tx_26', date: '2027-05-04', type: 'income', title: 'Sueldo Global Mayo', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/05' },
+                { id: 'tx_27', date: '2027-05-09', type: 'expense', title: 'Préstamo Galicia (Cuota 9/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'En curso normal ($263.000)' },
+                { id: 'tx_27b', date: '2027-05-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 7/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_28', date: '2027-05-20', type: 'income', title: 'Comisiones Global Mayo', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/05' },
+
+                // JUNIO 2027 (Cuota 10/12 Galicia + Cuota 8/12 Naranja X)
+                { id: 'tx_29', date: '2027-06-01', type: 'income', title: 'Dinero en Cuenta (Reserva May)', amount: 1018496, category: 'cat_cuenta', status: 'pending', note: 'Arrastre positivo Mayo' },
+                { id: 'tx_30', date: '2027-06-04', type: 'income', title: 'Sueldo Global Junio', amount: 1300000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 04/06' },
+                { id: 'tx_31', date: '2027-06-09', type: 'expense', title: 'Préstamo Galicia (Cuota 10/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', note: 'Al día ($263.000)' },
+                { id: 'tx_31b', date: '2027-06-12', type: 'expense', title: 'Préstamo Naranja X (Cuota 8/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', note: 'Cuota mensual' },
+                { id: 'tx_32', date: '2027-06-20', type: 'income', title: 'Comisiones Global Junio', amount: 350000, category: 'cat_comisiones', status: 'pending', note: 'Fecha estimada 20/06' },
+                { id: 'tx_33', date: '2027-06-24', type: 'income', title: 'Aguinaldo Junio', amount: 700000, category: 'cat_sueldo', status: 'pending', note: 'Fecha estimada 24/06' }
+            ];
+
+            saveState();
+            if (notify) {
+                renderAll();
+                showToast('Datos de tu planilla 2026–2027 restaurados', 'success');
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Error guardando estado:', e);
+            }
+        }
+
+        // =========================================================================
+        // CÁLCULO POR CUOTA Y MES DE PRÉSTAMOS + TARJETAS MANUALES
+        // =========================================================================
+        function monthDiff(fromKey, toKey) {
+            const [fy, fm] = fromKey.split('-').map(Number);
+            const [ty, tm] = toKey.split('-').map(Number);
+            return (ty - fy) * 12 + (tm - fm);
+        }
+
+        function getLoanSnapshotForMonth(loan, targetMonthKey) {
+            const diff = monthDiff(loan.baseMonthKey || '2026-12', targetMonthKey);
+            const total = Math.max(1, Number(loan.totalInstallments) || 12);
+            const instAmt = Math.max(0, Number(loan.installmentAmount) || 0);
+            const baseInstallment = Math.max(0, Number(loan.installmentPaidInBaseMonth) || 1);
+
+            // En Diciembre 2026 (diff = 0) se paga la cuota base (ej: 4/12 Galicia, 2/12 Naranja X)
+            const currentInstallment = Math.min(total, Math.max(0, baseInstallment + Math.max(0, diff)));
+            const remainingInstallments = Math.max(0, total - currentInstallment);
+            const remainingBalance = remainingInstallments * instAmt;
+
+            return {
+                currentInstallment,
+                totalInstallments: total,
+                remainingInstallments,
+                remainingBalance
+            };
+        }
+
+        function getCardConsumptionMetrics(card) {
+            const available = Math.max(0, Number(card.available) || 0);
+            const limit = Math.max(0, Number(card.limit) || 0);
+            const taxRate = Math.max(0, Number(card.taxRate) || 0);
+            const used = Math.max(0, limit - available);
+            const taxAmount = Math.round(used * (taxRate / 100));
+            const estimatedNextMonth = used + taxAmount;
+            return { available, limit, used, taxRate, taxAmount, estimatedNextMonth };
+        }
+
+        function getTotalCardsConsumedFromBars() {
+            return state.cards.reduce((sum, c) => sum + getCardConsumptionMetrics(c).estimatedNextMonth, 0);
+        }
+
+        // Calcula el N-ésimo día hábil (por defecto 4to día hábil) del mes en Argentina
+        function getNthBusinessDay(year, month, nth = 4) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let businessCount = 0;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const d = new Date(year, month, day);
+                const dow = d.getDay(); // 0 = Domingo, 6 = Sábado
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isWeekend = (dow === 0 || dow === 6);
+                const isHoliday = ARGENTINA_HOLIDAYS.has(dateStr);
+                if (!isWeekend && !isHoliday) {
+                    businessCount++;
+                    if (businessCount === nth) {
+                        return { day, dateStr };
+                    }
+                }
+            }
+            return { day: 6, dateStr: `${year}-${String(month + 1).padStart(2, '0')}-06` };
+        }
+
+        function setGlobalCardTax(rate) {
+            state.cards.forEach(c => { c.taxRate = rate; });
+            saveState();
+            renderAll();
+            showToast(`Taxes estimados de tarjetas ajustados al ${rate}%`, 'info');
+        }
+
+        // =========================================================================
+        // FORMATTING & HELPERS
+        // =========================================================================
+        function formatARS(num) {
+            const val = Number(num) || 0;
+            return '$ ' + Math.round(val).toLocaleString('es-AR');
+        }
+
+        function formatUSD(num) {
+            const val = Number(num) || 0;
+            return 'USD ' + val.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        function getCurrentMonthPrefix() {
+            const m = String(state.currentMonth + 1).padStart(2, '0');
+            return `${state.currentYear}-${m}`;
+        }
+
+        function getMonthTransactions() {
+            const prefix = getCurrentMonthPrefix();
+            return state.transactions.filter(tx => tx.date.startsWith(prefix));
+        }
+
+        function getCategoryById(id) {
+            return state.categories.find(c => c.id === id) || { id: 'cat_otros', name: 'Otros', color: '#71717a' };
+        }
+
+        function getNextMonthInfo(year, month) {
+            let nextMonth = month + 1;
+            let nextYear = year;
+            if (nextMonth > 11) {
+                nextMonth = 0;
+                nextYear++;
+            }
+            const monthKey = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}`;
+            const label = new Date(nextYear, nextMonth, 1).toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+            return { year: nextYear, month: nextMonth, monthKey, label };
+        }
+
+        function getProjectedCardItemsForMonth(year, month) {
+            let prevMonth = month - 1;
+            let prevYear = year;
+            if (prevMonth < 0) {
+                prevMonth = 11;
+                prevYear--;
+            }
+
+            const activeKey = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, '0')}`;
+            const prevKey = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
+
+            if (prevKey !== activeKey) return [];
+
+            // Vencimiento automático el 4to día hábil del mes siguiente (contemplando fines de semana y feriados)
+            const fourthBiz = getNthBusinessDay(year, month, 4);
+            const dayPadded = String(fourthBiz.day).padStart(2, '0');
+
+            return state.cards
+                .map(card => {
+                    const metrics = getCardConsumptionMetrics(card);
+                    return {
+                        id: `est_card_${card.id}`,
+                        cardId: card.id,
+                        date: fourthBiz.dateStr,
+                        day: dayPadded,
+                        type: 'expense',
+                        title: `Vto. ${card.name} (Est. +${metrics.taxRate}% tax)`,
+                        amount: metrics.estimatedNextMonth,
+                        used: metrics.used,
+                        taxRate: metrics.taxRate,
+                        available: metrics.available,
+                        limit: metrics.limit,
+                        isAutoCardEstimate: true
+                    };
+                })
+                .filter(item => item.amount > 0);
+        }
+
+        // =========================================================================
+        // RENDERING PIPELINE
+        // =========================================================================
+        function renderAll() {
+            renderHeaderMonth();
+            renderKPIs();
+            renderLiquidityAndCards();
+            renderCocoGoal();
+            renderRoadmapTable();
+            renderCalendar();
+            renderMonthMovementsList();
+            renderChart();
+            renderCategorySelect();
+            lucide.createIcons();
+        }
+
+        function renderHeaderMonth() {
+            const dateObj = new Date(state.currentYear, state.currentMonth, 1);
+            const label = dateObj.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+            document.getElementById('currentMonthLabel').textContent = label;
+        }
+
+        function renderKPIs() {
+            const txs = getMonthTransactions();
+            let incomeCompleted = 0, incomePending = 0;
+            let expenseCompleted = 0, expensePending = 0;
+
+            txs.forEach(tx => {
+                const amt = Number(tx.amount) || 0;
+                if (tx.type === 'income') {
+                    if (tx.status === 'completed') incomeCompleted += amt;
+                    else incomePending += amt;
+                } else {
+                    if (tx.status === 'completed') expenseCompleted += amt;
+                    else expensePending += amt;
+                }
+            });
+
+            const totalIncome = incomeCompleted + incomePending;
+            const totalExpense = expenseCompleted + expensePending;
+            const realBalance = incomeCompleted - expenseCompleted;
+            const projectedBalance = totalIncome - totalExpense;
+
+            document.getElementById('kpiIncomeTotal').textContent = formatARS(totalIncome);
+            document.getElementById('kpiIncomeBreakdown').textContent = `Cobrado: ${formatARS(incomeCompleted)} · Pend: ${formatARS(incomePending)}`;
+
+            document.getElementById('kpiExpenseTotal').textContent = formatARS(totalExpense);
+            document.getElementById('kpiExpenseBreakdown').textContent = `Pagado: ${formatARS(expenseCompleted)} · Pend: ${formatARS(expensePending)}`;
+
+            const realEl = document.getElementById('kpiRealBalance');
+            realEl.textContent = formatARS(realBalance);
+            realEl.className = `text-2xl font-bold font-mono tabular-nums ${realBalance >= 0 ? 'text-white' : 'text-rose-400'}`;
+
+            const projEl = document.getElementById('kpiProjectedBalance');
+            projEl.textContent = formatARS(projectedBalance);
+            projEl.className = `text-2xl font-bold font-mono tabular-nums ${projectedBalance >= 0 ? 'text-amber-300' : 'text-rose-400'}`;
+        }
+
+        function renderLiquidityAndCards() {
+            const liqContainer = document.getElementById('liquidityBarsContainer');
+            const bank = state.liquidity.bank;
+            const usdt = state.liquidity.usdt;
+
+            const bankPct = bank.reference > 0 ? Math.min(100, Math.max(0, Math.round((bank.amount / bank.reference) * 100))) : 100;
+            const usdtPct = usdt.reference > 0 ? Math.min(100, Math.max(0, Math.round((usdt.amount / usdt.reference) * 100))) : 100;
+
+            liqContainer.innerHTML = `
+                <div onclick="openManualBarModal('liquidity', 'bank')" class="group cursor-pointer p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 hover:border-blue-500/50 transition-all space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
+                            <i data-lucide="landmark" class="w-3.5 h-3.5 text-blue-400"></i>
+                            ${bank.name}
+                        </span>
+                        <i data-lucide="pencil" class="w-3 h-3 text-zinc-500 group-hover:text-blue-400"></i>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-lg font-bold font-mono tabular-nums text-white">${formatARS(bank.amount)}</span>
+                        <span class="text-[11px] font-mono text-zinc-500">Ref: ${formatARS(bank.reference)}</span>
+                    </div>
+                    <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: ${bankPct}%"></div>
+                    </div>
+                </div>
+
+                <div onclick="openManualBarModal('liquidity', 'usdt')" class="group cursor-pointer p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 hover:border-teal-500/50 transition-all space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
+                            <i data-lucide="coins" class="w-3.5 h-3.5 text-teal-400"></i>
+                            ${usdt.name}
+                        </span>
+                        <i data-lucide="pencil" class="w-3 h-3 text-zinc-500 group-hover:text-teal-400"></i>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-lg font-bold font-mono tabular-nums text-teal-300">${Number(usdt.amount).toLocaleString('es-AR')} USDT</span>
+                        <span class="text-[11px] font-mono text-zinc-500">Ref: ${Number(usdt.reference).toLocaleString('es-AR')} USDT</span>
+                    </div>
+                    <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-teal-500 rounded-full transition-all duration-300" style="width: ${usdtPct}%"></div>
+                    </div>
+                </div>
+            `;
+
+            const cardsContainer = document.getElementById('creditCardsContainer');
+            let totalAvailable = 0;
+            let totalNextMonthEstimate = 0;
+
+            // Actualizar estado visual de los botones rápidos de taxes (5%, 7.5%, 10%)
+            const currentTaxSample = state.cards[0]?.taxRate ?? 7.5;
+            [
+                { id: 'taxPreset5Btn', val: 5 },
+                { id: 'taxPreset75Btn', val: 7.5 },
+                { id: 'taxPreset10Btn', val: 10 }
+            ].forEach(btn => {
+                const el = document.getElementById(btn.id);
+                if (el) {
+                    el.className = Number(currentTaxSample) === btn.val
+                        ? 'px-1.5 py-0.5 rounded font-mono bg-indigo-500/25 text-indigo-300 font-semibold'
+                        : 'px-1.5 py-0.5 rounded font-mono text-zinc-400 hover:text-white';
+                }
+            });
+
+            cardsContainer.innerHTML = state.cards.map(card => {
+                const { available, limit, used, taxRate, estimatedNextMonth } = getCardConsumptionMetrics(card);
+                totalAvailable += available;
+                totalNextMonthEstimate += estimatedNextMonth;
+                const pct = limit > 0 ? Math.min(100, Math.max(0, Math.round((available / limit) * 100))) : 100;
+
+                const deltaBadgeHtml = estimatedNextMonth > 0
+                    ? `<span class="text-[10px] font-mono font-semibold text-amber-400">Est. +${taxRate}%: ${formatARS(estimatedNextMonth)}</span>`
+                    : `<span class="text-[10px] font-mono text-zinc-500">Sin consumo</span>`;
+
+                return `
+                    <div onclick="openManualBarModal('card', '${card.id}')" class="group cursor-pointer p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 hover:border-indigo-500/50 transition-all space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-medium text-zinc-300 flex items-center gap-1.5 truncate">
+                                <i data-lucide="credit-card" class="w-3.5 h-3.5 text-indigo-400 shrink-0"></i>
+                                <span class="truncate">${card.name}</span>
+                            </span>
+                            <i data-lucide="pencil" class="w-3 h-3 text-zinc-500 group-hover:text-indigo-400 shrink-0"></i>
+                        </div>
+                        <div class="flex items-baseline justify-between gap-2">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider text-zinc-500 block leading-none mb-0.5">Disponible</span>
+                                <span class="text-base font-bold font-mono tabular-nums text-white">${formatARS(available)}</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-zinc-500">Lím: ${formatARS(limit)}</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-0.5 text-[10px] text-zinc-500 font-mono">
+                            <span>Utilizado: ${formatARS(used)}</span>
+                            ${deltaBadgeHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalCardsAvailableLabel').textContent = `Total disp: ${formatARS(totalAvailable)}`;
+
+            const nextMonth = getNextMonthInfo(state.currentYear, state.currentMonth);
+            const fourthBizNext = getNthBusinessDay(nextMonth.year, nextMonth.month, 4);
+            const fourthBizLabel = `${String(fourthBizNext.day).padStart(2, '0')}/${String(nextMonth.month + 1).padStart(2, '0')}`;
+
+            const strip = document.getElementById('nextMonthCardsEstimateStrip');
+            const cardChips = state.cards.map(card => {
+                const { estimatedNextMonth, taxRate } = getCardConsumptionMetrics(card);
+                return `
+                    <button type="button" onclick="openManualBarModal('card', '${card.id}')"
+                        class="px-2.5 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 border ${estimatedNextMonth > 0 ? 'border-amber-500/35' : 'border-zinc-800'} text-left transition-colors flex items-center justify-between gap-2">
+                        <span class="text-[11px] text-zinc-300 truncate">${card.name} <span class="text-zinc-500">(+${taxRate}%)</span></span>
+                        <span class="text-[11px] font-mono font-semibold ${estimatedNextMonth > 0 ? 'text-amber-400' : 'text-zinc-500'}">${formatARS(estimatedNextMonth)}</span>
+                    </button>
+                `;
+            }).join('');
+
+            strip.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+                        <i data-lucide="calculator" class="w-3.5 h-3.5 text-indigo-400"></i>
+                        Estimado Tarjetas ${nextMonth.label} (4to día hábil: ${fourthBizLabel})
+                    </span>
+                    <span class="text-xs font-bold font-mono tabular-nums ${totalNextMonthEstimate > 0 ? 'text-amber-400' : 'text-zinc-400'}">
+                        Total: ${formatARS(totalNextMonthEstimate)}
+                    </span>
+                </div>
+                <p class="text-[10px] text-zinc-400 leading-snug">
+                    Cálculo: (Límite − Disponible) + Taxes. Agendado automáticamente en el calendario el ${fourthBizLabel} (4to día hábil).
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+                    ${cardChips}
+                </div>
+            `;
+        }
+
+        function renderCocoGoal() {
+            const { title, paid, target } = state.cocoGoal;
+            const pct = target > 0 ? Math.min(100, Math.max(0, Math.round((paid / target) * 100))) : 0;
+            const remaining = Math.max(0, target - paid);
+
+            document.getElementById('cocoGoalTitle').textContent = title;
+            document.getElementById('cocoPaidDisplay').textContent = formatUSD(paid);
+            document.getElementById('cocoTargetDisplay').textContent = formatUSD(target);
+            document.getElementById('cocoProgressBar').style.width = `${pct}%`;
+            document.getElementById('cocoPercentLabel').textContent = `${pct}% completado`;
+            document.getElementById('cocoRemainingLabel').textContent = remaining === 0 ? '¡Saldado al 100%!' : `Restan: ${formatUSD(remaining)}`;
+        }
+
+        function renderRoadmapTable() {
+            const thead = document.getElementById('roadmapTableHead');
+            const tbody = document.getElementById('roadmapTableBody');
+            const tfoot = document.getElementById('roadmapTableFooter');
+            const loansSummaryEl = document.getElementById('loansStatusSummary');
+
+            const activeKey = getCurrentMonthPrefix();
+            const refMonthKey = activeKey < '2026-12' ? '2026-12' : activeKey;
+
+            if (loansSummaryEl) {
+                if (state.loans.length === 0) {
+                    loansSummaryEl.innerHTML = `
+                        <div onclick="openLoansConfigModal()" class="col-span-full cursor-pointer p-2.5 rounded-xl bg-zinc-950/90 border border-dashed border-zinc-800 hover:border-amber-500/40 text-center text-[11px] text-zinc-400">
+                            Sin préstamos activos en la hoja de ruta · Clic para agregar
+                        </div>
+                    `;
+                } else {
+                    loansSummaryEl.innerHTML = state.loans.map(loan => {
+                        const snap = getLoanSnapshotForMonth(loan, refMonthKey);
+                        return `
+                            <div onclick="openLoansConfigModal()" class="cursor-pointer p-2.5 rounded-xl bg-zinc-950/90 border ${loan.borderClass || 'border-sky-500/25'} hover:border-amber-400/50 transition-colors">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-semibold ${loan.colorClass || 'text-sky-300'}">Préstamo ${loan.name}</span>
+                                    <span class="font-mono text-zinc-400">Cuota ${snap.currentInstallment}/${snap.totalInstallments}</span>
+                                </div>
+                                <div class="flex items-baseline justify-between mt-1">
+                                    <span class="text-xs font-bold font-mono ${snap.remainingBalance === 0 ? 'text-emerald-400' : 'text-white'}">${formatARS(snap.remainingBalance)}</span>
+                                    <span class="text-[10px] text-zinc-400 font-mono">Quedan ${snap.remainingInstallments} ctas</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            if (thead) {
+                const dynamicLoanHeaders = state.loans.map(loan =>
+                    `<th class="py-1.5 font-medium text-right">${loan.name}</th>`
+                ).join('');
+                thead.innerHTML = `
+                    <tr class="border-b border-zinc-800 text-zinc-400 text-[10px] uppercase tracking-wider">
+                        <th class="py-1.5 font-medium">Mes</th>
+                        ${dynamicLoanHeaders}
+                        <th class="py-1.5 font-medium text-right">Tarjetas</th>
+                        <th class="py-1.5 font-medium text-right">Cocó</th>
+                        <th class="py-1.5 font-medium text-right">Deuda Total</th>
+                        <th class="py-1.5 font-medium text-right">Neto</th>
+                    </tr>
+                `;
+            }
+
+            const totalCardsFromBars = getTotalCardsConsumedFromBars();
+            const nextMonthInfo = getNextMonthInfo(state.currentYear, state.currentMonth);
+
+            tbody.innerHTML = state.roadmapPlan.map((row, idx) => {
+                let rowLoansDebt = 0;
+                const dynamicLoanCells = state.loans.map(loan => {
+                    const snap = getLoanSnapshotForMonth(loan, row.monthKey);
+                    rowLoansDebt += snap.remainingBalance;
+                    return `
+                        <td class="py-1.5 text-right ${snap.remainingBalance === 0 ? 'text-emerald-400' : (loan.colorClass || 'text-sky-300')}">
+                            <div>${formatARS(snap.remainingBalance)}</div>
+                            <div class="text-[9px] text-zinc-500">cta ${snap.currentInstallment}/${snap.totalInstallments}</div>
+                        </td>
+                    `;
+                }).join('');
+
+                const shouldAddLiveBars = (row.monthKey === nextMonthInfo.monthKey) || (row.monthKey >= '2027-03');
+                const tarjetasTotal = (Number(row.tarjetasBase) || 0) + (shouldAddLiveBars ? totalCardsFromBars : 0);
+
+                const coco = Number(row.coco) || 0;
+                const neto = Number(row.neto) || 0;
+                const deudaTotal = rowLoansDebt + tarjetasTotal + coco;
+                const isSelectedMonth = row.monthKey === activeKey;
+
+                return `
+                    <tr onclick="openRoadmapModal(${idx})" class="cursor-pointer hover:bg-zinc-800/60 transition-colors group ${isSelectedMonth ? 'bg-indigo-950/25' : ''}">
+                        <td class="py-1.5 font-sans font-medium text-zinc-200 group-hover:text-amber-300">
+                            ${row.mes}
+                        </td>
+                        ${dynamicLoanCells}
+                        <td class="py-1.5 text-right ${tarjetasTotal === 0 ? 'text-emerald-400' : 'text-amber-300'}">
+                            ${formatARS(tarjetasTotal)}
+                        </td>
+                        <td class="py-1.5 text-right ${coco === 0 ? 'text-emerald-400' : 'text-violet-300'}">
+                            ${formatARS(coco)}
+                        </td>
+                        <td class="py-1.5 text-right font-semibold ${deudaTotal === 0 ? 'text-emerald-400' : 'text-zinc-200'}">
+                            ${formatARS(deudaTotal)}
+                        </td>
+                        <td class="py-1.5 text-right font-semibold ${neto > 0 ? 'text-emerald-400' : 'text-zinc-500'}">
+                            ${formatARS(neto)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const lastRow = state.roadmapPlan[state.roadmapPlan.length - 1];
+            if (lastRow && tfoot) {
+                let endLoansDebt = 0;
+                const endLoanCells = state.loans.map(loan => {
+                    const snap = getLoanSnapshotForMonth(loan, lastRow.monthKey);
+                    endLoansDebt += snap.remainingBalance;
+                    return `<td class="py-1.5 text-right ${snap.remainingBalance === 0 ? 'text-emerald-400' : (loan.colorClass || 'text-sky-300')}">${formatARS(snap.remainingBalance)}</td>`;
+                }).join('');
+
+                const tarjetasLast = (Number(lastRow.tarjetasBase) || 0) + totalCardsFromBars;
+                const endTotalDebt = endLoansDebt + tarjetasLast + (Number(lastRow.coco) || 0);
+
+                tfoot.innerHTML = `
+                    <tr class="text-zinc-300">
+                        <td class="py-1.5 font-sans font-semibold text-zinc-400">Cierre ${lastRow.mes}</td>
+                        ${endLoanCells}
+                        <td class="py-1.5 text-right text-amber-300">${formatARS(tarjetasLast)}</td>
+                        <td class="py-1.5 text-right text-emerald-400">${formatARS(lastRow.coco)}</td>
+                        <td class="py-1.5 text-right font-bold text-white">${formatARS(endTotalDebt)}</td>
+                        <td class="py-1.5 text-right font-bold text-emerald-400">${formatARS(lastRow.neto)}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderLoansEditorList() {
+            const container = document.getElementById('loansEditorList');
+            if (!container) return;
+
+            if (state.loans.length === 0) {
+                container.innerHTML = `<p class="text-xs text-zinc-400 text-center py-4 border border-dashed border-zinc-800 rounded-xl">No hay préstamos cargados. Agregá uno abajo.</p>`;
+                return;
+            }
+
+            container.innerHTML = state.loans.map((loan, idx) => {
+                const dicSnap = getLoanSnapshotForMonth(loan, '2026-12');
+                return `
+                    <div data-loan-idx="${idx}" class="loan-editor-card p-3.5 rounded-xl bg-zinc-950 border ${loan.borderClass || 'border-zinc-800'} space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <input type="text" data-field="name" value="${loan.name}"
+                                class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1 text-xs font-bold ${loan.colorClass || 'text-white'} focus:outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-mono text-zinc-400">Saldo tras Dic: ${formatARS(dicSnap.remainingBalance)}</span>
+                                <button type="button" onclick="deleteLoanFromRoadmap('${loan.id}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-zinc-400 hover:text-rose-400 transition-colors" title="Eliminar préstamo de la hoja de ruta">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <div>
+                                <label class="block text-[10px] text-zinc-400 mb-1">Cuota que se paga en Dic</label>
+                                <input type="number" data-field="installmentPaidInBaseMonth" min="0" max="120" value="${loan.installmentPaidInBaseMonth}"
+                                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-zinc-400 mb-1">Total Cuotas</label>
+                                <input type="number" data-field="totalInstallments" min="1" max="120" value="${loan.totalInstallments}"
+                                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-zinc-400 mb-1">Valor Cuota ($)</label>
+                                <input type="number" data-field="installmentAmount" min="0" step="any" value="${loan.installmentAmount}"
+                                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openLoansConfigModal() {
+            renderLoansEditorList();
+            document.getElementById('loansConfigModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeLoansConfigModal() {
+            document.getElementById('loansConfigModal').classList.add('hidden');
+        }
+
+        function saveLoansFromModal() {
+            const cards = document.querySelectorAll('.loan-editor-card');
+            cards.forEach((cardEl, idx) => {
+                if (!state.loans[idx]) return;
+                const name = cardEl.querySelector('[data-field="name"]').value.trim();
+                const paidDic = Math.max(0, parseInt(cardEl.querySelector('[data-field="installmentPaidInBaseMonth"]').value, 10) || 0);
+                const total = Math.max(1, parseInt(cardEl.querySelector('[data-field="totalInstallments"]').value, 10) || 1);
+                const amount = Math.max(0, parseFloat(cardEl.querySelector('[data-field="installmentAmount"]').value) || 0);
+
+                if (name) state.loans[idx].name = name;
+                state.loans[idx].installmentPaidInBaseMonth = paidDic;
+                state.loans[idx].totalInstallments = total;
+                state.loans[idx].installmentAmount = amount;
+            });
+
+            saveState();
+            closeLoansConfigModal();
+            renderRoadmapTable();
+            lucide.createIcons();
+            showToast('Préstamos y cuotas actualizados en la Hoja de Ruta', 'success');
+        }
+
+        function deleteLoanFromRoadmap(loanId) {
+            state.loans = state.loans.filter(l => l.id !== loanId);
+            saveState();
+            renderLoansEditorList();
+            renderRoadmapTable();
+            lucide.createIcons();
+            showToast('Préstamo eliminado de la Hoja de Ruta', 'info');
+        }
+
+        function openRoadmapModal(idx) {
+            const row = state.roadmapPlan[idx];
+            if (!row) return;
+            const barsTotal = getTotalCardsConsumedFromBars();
+            const breakdownEl = document.getElementById('rmLoansBreakdown');
+
+            const loansHtml = state.loans.length === 0
+                ? `<div class="flex justify-between"><span class="text-zinc-400">Préstamos activos:</span><span class="font-mono text-zinc-400">$ 0</span></div>`
+                : state.loans.map(loan => {
+                    const snap = getLoanSnapshotForMonth(loan, row.monthKey);
+                    return `
+                        <div class="flex justify-between">
+                            <span class="text-zinc-400">Prést. ${loan.name} (calculado):</span>
+                            <span class="font-mono ${loan.colorClass || 'text-sky-300'}">${formatARS(snap.remainingBalance)} (cuota ${snap.currentInstallment}/${snap.totalInstallments})</span>
+                        </div>
+                    `;
+                }).join('');
+
+            breakdownEl.innerHTML = `
+                ${loansHtml}
+                <div class="flex justify-between pt-1 border-t border-zinc-800/80">
+                    <span class="text-zinc-400">Consumo activo 4 barritas tarjetas:</span>
+                    <span class="font-mono text-amber-300">${formatARS(barsTotal)}</span>
+                </div>
+            `;
+
+            document.getElementById('rmIndex').value = idx;
+            document.getElementById('roadmapModalTitle').textContent = `Ajuste Mensual — ${row.mes}`;
+            document.getElementById('rmTarjetas').value = row.tarjetasBase;
+            document.getElementById('rmCoco').value = row.coco;
+            document.getElementById('rmNeto').value = row.neto;
+            document.getElementById('roadmapModal').classList.remove('hidden');
+        }
+
+        function closeRoadmapModal() {
+            document.getElementById('roadmapModal').classList.add('hidden');
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            const year = state.currentYear;
+            const month = state.currentMonth;
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            let startOffset = firstDayOfMonth.getDay() - 1;
+            if (startOffset < 0) startOffset = 6;
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthTxs = getMonthTransactions();
+            const projectedCardItems = getProjectedCardItemsForMonth(year, month);
+            const refToday = '2026-11-23';
+
+            for (let i = 0; i < startOffset; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'min-h-[82px] sm:min-h-[104px] rounded-xl bg-zinc-950/30 border border-zinc-800/30';
+                grid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayTxs = monthTxs.filter(t => t.date === dateStr);
+                const dayProjectedCards = projectedCardItems.filter(p => p.date === dateStr);
+
+                let dayIncome = 0;
+                let dayExpense = 0;
+                let hasPending = false;
+
+                dayTxs.forEach(tx => {
+                    if (tx.type === 'income') dayIncome += Number(tx.amount);
+                    else dayExpense += Number(tx.amount);
+                    if (tx.status === 'pending') hasPending = true;
+                });
+
+                dayProjectedCards.forEach(p => {
+                    dayExpense += Number(p.amount);
+                    hasPending = true;
+                });
+
+                const isToday = dateStr === refToday;
+
+                const cell = document.createElement('button');
+                cell.type = 'button';
+                cell.onclick = () => openDayModal(dateStr);
+                cell.className = `group min-h-[82px] sm:min-h-[104px] p-1.5 sm:p-2 rounded-xl border text-left flex flex-col justify-between transition-all hover:border-indigo-500/60 hover:bg-zinc-800/60 ${
+                    isToday
+                        ? 'bg-indigo-950/25 border-indigo-500/60 ring-1 ring-indigo-500/30'
+                        : (dayTxs.length > 0 || dayProjectedCards.length > 0)
+                            ? 'bg-zinc-900 border-zinc-800'
+                            : 'bg-zinc-950/50 border-zinc-800/50'
+                }`;
+
+                let dotsHtml = '';
+                if (dayIncome > 0) dotsHtml += `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>`;
+                if (dayExpense > 0) dotsHtml += `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>`;
+                if (hasPending) dotsHtml += `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>`;
+
+                const combinedPreview = [
+                    ...dayTxs.map(t => ({
+                        title: t.title,
+                        amount: Number(t.amount),
+                        isInc: t.type === 'income',
+                        isPend: t.status === 'pending',
+                        isEst: false
+                    })),
+                    ...dayProjectedCards.map(p => ({
+                        title: p.title,
+                        amount: Number(p.amount),
+                        isInc: false,
+                        isPend: true,
+                        isEst: true
+                    }))
+                ];
+
+                let itemsHtml = '';
+                if (combinedPreview.length > 0) {
+                    const topItems = combinedPreview.slice(0, 2);
+                    itemsHtml = `<div class="space-y-1 mt-1 w-full overflow-hidden">`;
+                    topItems.forEach(item => {
+                        const badgeClass = item.isEst
+                            ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/35 border-dashed'
+                            : item.isPend
+                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                                : item.isInc
+                                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20'
+                                    : 'bg-rose-500/15 text-rose-300 border-rose-500/20';
+
+                        itemsHtml += `
+                            <div class="text-[10px] px-1.5 py-0.5 rounded border ${badgeClass} truncate font-medium leading-tight" title="${item.title}: ${formatARS(item.amount)}">
+                                <span class="hidden sm:inline">${item.title} · </span>${item.isInc ? '+' : '-'}${formatARS(item.amount)}
+                            </div>
+                        `;
+                    });
+                    if (combinedPreview.length > 2) {
+                        itemsHtml += `<div class="text-[10px] text-zinc-400 pl-1">+${combinedPreview.length - 2} más</div>`;
+                    }
+                    itemsHtml += `</div>`;
+                }
+
+                cell.innerHTML = `
+                    <div class="w-full flex items-center justify-between">
+                        <span class="text-xs sm:text-sm font-semibold ${isToday ? 'text-indigo-400' : 'text-zinc-300 group-hover:text-white'}">${day}</span>
+                        <div class="flex items-center gap-1">${dotsHtml}</div>
+                    </div>
+                    ${itemsHtml}
+                `;
+
+                grid.appendChild(cell);
+            }
+        }
+
+        function setListFilter(filter) {
+            listFilter = filter;
+            document.getElementById('filterAllBtn').className = filter === 'all'
+                ? 'px-2 py-0.5 rounded bg-zinc-800 text-white font-medium'
+                : 'px-2 py-0.5 rounded text-zinc-400 hover:text-white';
+            document.getElementById('filterPendingBtn').className = filter === 'pending'
+                ? 'px-2 py-0.5 rounded bg-zinc-800 text-white font-medium'
+                : 'px-2 py-0.5 rounded text-zinc-400 hover:text-white';
+            renderMonthMovementsList();
+            lucide.createIcons();
+        }
+
+        function renderMonthMovementsList() {
+            const container = document.getElementById('monthMovementsList');
+            let txs = getMonthTransactions().map(t => ({ ...t, isAutoCardEstimate: false }));
+            const projectedCards = getProjectedCardItemsForMonth(state.currentYear, state.currentMonth);
+
+            let combined = [...txs, ...projectedCards].sort((a, b) => a.date.localeCompare(b.date));
+
+            if (listFilter === 'pending') {
+                combined = combined.filter(t => t.isAutoCardEstimate || t.status === 'pending');
+            }
+
+            if (combined.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 px-4 border border-dashed border-zinc-800 rounded-xl">
+                        <p class="text-xs text-zinc-400">No hay movimientos ${listFilter === 'pending' ? 'pendientes ' : ''}cargados en este mes.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = combined.map(tx => {
+                if (tx.isAutoCardEstimate) {
+                    return `
+                        <div onclick="openManualBarModal('card', '${tx.cardId}')" class="cursor-pointer p-3 rounded-xl bg-indigo-950/20 border border-dashed border-indigo-500/35 flex items-center justify-between gap-2.5 hover:border-indigo-400/60 transition-colors">
+                    <div class="p-3 rounded-xl bg-indigo-950/20 border border-dashed border-indigo-500/35 flex items-center justify-between gap-2.5 hover:border-indigo-400/60 transition-colors" onclick="openManualBarModal('card', '${tx.cardId}')">
+                        <div class="flex items-center gap-2.5 min-w-0 cursor-pointer">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-[9px] uppercase text-indigo-300 leading-none">4º Háb</span>
+                                <span class="text-xs font-bold text-indigo-200 leading-tight">${tx.day}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium text-indigo-200 truncate">${tx.title}</p>
+                                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                                    <span class="text-[11px] font-mono font-semibold text-amber-400">
+                                        -${formatARS(tx.amount)}
+                                    </span>
+                                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300">
+                                        4to día hábil
+                                    </span>
+                                </div>
+                                <p class="text-[10px] text-zinc-400 truncate mt-0.5">Utilizado: ${formatARS(tx.used)} + ${tx.taxRate}% taxes</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-indigo-300 shrink-0 cursor-pointer">Editar</span>
+                    </div>
+                `;
+                }
+
+                const isInc = tx.type === 'income';
+                const isPend = tx.status === 'pending';
+                const dayNum = tx.date.split('-')[2];
+                const cat = getCategoryById(tx.category);
+
+                return `
+                    <div class="p-3 rounded-xl bg-zinc-950/70 border ${isPend ? 'border-amber-500/30' : 'border-zinc-800/90'} flex items-center justify-between gap-2.5 hover:border-zinc-700 transition-colors">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-[9px] uppercase text-zinc-500 leading-none">Día</span>
+                                <span class="text-xs font-bold text-zinc-200 leading-tight">${dayNum}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium text-white truncate">${tx.title}</p>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[11px] font-mono font-semibold ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
+                                        ${isInc ? '+' : '-'}${formatARS(tx.amount)}
+                                    </span>
+                                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-400 truncate" style="border-left: 2px solid ${cat.color}">
+                                        ${cat.name}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1 shrink-0">
+                            ${isPend ? `
+                                <button type="button" onclick="toggleTxStatus('${tx.id}')" class="px-2 py-1 rounded-lg bg-amber-500/15 hover:bg-emerald-500/20 text-amber-300 hover:text-emerald-300 border border-amber-500/30 hover:border-emerald-500/30 text-[10px] font-semibold transition-colors" title="Marcar como cobrado/pagado">
+                                    ${isInc ? 'Cobrar' : 'Pagar'}
+                                </button>
+                            ` : `
+                                <button type="button" onclick="toggleTxStatus('${tx.id}')" class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-zinc-800 hover:text-zinc-300 transition-colors" title="Efectivizado (clic para volver a pendiente)">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                </button>
+                            `}
+                            <button type="button" onclick="openDayModal('${tx.date}', '${tx.id}')" class="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Editar">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('cashflowChart').getContext('2d');
+            const year = state.currentYear;
+            const month = state.currentMonth;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthTxs = getMonthTransactions();
+
+            const labels = [];
+            const cumulativeData = [];
+            let running = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                labels.push(String(d));
+                monthTxs.filter(t => t.date === dateStr).forEach(t => {
+                    running += t.type === 'income' ? Number(t.amount) : -Number(t.amount);
+                });
+                cumulativeData.push(running);
+            }
+
+            if (cashflowChartInstance) {
+                cashflowChartInstance.destroy();
+            }
+
+            cashflowChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Flujo Acumulado del Mes (ARS)',
+                        data: cumulativeData,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.14)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#11151c',
+                            borderColor: '#27272a',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: (items) => `Día ${items[0].label}`,
+                                label: (item) => `Acumulado: ${formatARS(item.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            ticks: { color: '#71717a', font: { size: 10 }, maxTicksLimit: 10 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#71717a',
+                                font: { size: 10 },
+                                callback: (v) => '$' + (v / 1000).toFixed(0) + 'k'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // =========================================================================
+        // MODALS & INTERACTIONS
+        // =========================================================================
+        function updateCardModalPreview() {
+            const avail = Math.max(0, Number(document.getElementById('mbAmount').value) || 0);
+            const limit = Math.max(0, Number(document.getElementById('mbLimit').value) || 0);
+            const taxRate = Math.max(0, Number(document.getElementById('mbTaxRate').value) || 0);
+
+            const used = Math.max(0, limit - avail);
+            const taxAmt = Math.round(used * (taxRate / 100));
+            const estimated = used + taxAmt;
+
+            const usedEl = document.getElementById('mbPreviewUsed');
+            const taxPctEl = document.getElementById('mbPreviewTaxPct');
+            const taxAmtEl = document.getElementById('mbPreviewTaxAmt');
+            const previewEl = document.getElementById('mbPreviewConsumed');
+
+            if (usedEl) usedEl.textContent = formatARS(used);
+            if (taxPctEl) taxPctEl.textContent = taxRate;
+            if (taxAmtEl) taxAmtEl.textContent = formatARS(taxAmt);
+            if (previewEl) {
+                previewEl.textContent = formatARS(estimated);
+                previewEl.className = `font-mono ${estimated > 0 ? 'text-amber-400 font-semibold' : 'text-zinc-400'}`;
+            }
+        }
+
+        function openManualBarModal(type, id) {
+            document.getElementById('mbType').value = type;
+            document.getElementById('mbId').value = id;
+            const cardExtraGroup = document.getElementById('mbCardExtraGroup');
+
+            if (type === 'liquidity') {
+                cardExtraGroup.classList.add('hidden');
+                const item = state.liquidity[id];
+                document.getElementById('manualBarModalTitle').textContent = `Editar ${item.name}`;
+                document.getElementById('mbName').value = item.name;
+                document.getElementById('mbAmountLabel').textContent = `Saldo Actual (${item.currency})`;
+                document.getElementById('mbAmount').value = item.amount;
+                document.getElementById('mbLimitLabel').textContent = `Referencia Barra (${item.currency})`;
+                document.getElementById('mbLimit').value = item.reference;
+            } else {
+                const card = state.cards.find(c => c.id === id);
+                if (!card) return;
+                cardExtraGroup.classList.remove('hidden');
+                document.getElementById('manualBarModalTitle').textContent = 'Editar Disponible y Taxes Estimados';
+                document.getElementById('mbName').value = card.name;
+                document.getElementById('mbAmountLabel').textContent = 'Saldo Disponible Actual (ARS $)';
+                document.getElementById('mbAmount').value = card.available;
+                document.getElementById('mbLimitLabel').textContent = 'Límite Total de la Tarjeta (ARS $)';
+                document.getElementById('mbLimit').value = card.limit;
+                document.getElementById('mbTaxRate').value = card.taxRate ?? 7.5;
+                updateCardModalPreview();
+            }
+
+            document.getElementById('manualBarModal').classList.remove('hidden');
+        }
+
+        function closeManualBarModal() {
+            document.getElementById('manualBarModal').classList.add('hidden');
+        }
+
+        // Cocó Goal Modal & Quick Adjust
+        function openCocoModal() {
+            document.getElementById('cocoTitleInput').value = state.cocoGoal.title;
+            document.getElementById('cocoPaidInput').value = state.cocoGoal.paid;
+            document.getElementById('cocoTargetInput').value = state.cocoGoal.target;
+            document.getElementById('cocoModal').classList.remove('hidden');
+        }
+
+        function closeCocoModal() {
+            document.getElementById('cocoModal').classList.add('hidden');
+        }
+
+        function adjustCocoAmount(delta) {
+            state.cocoGoal.paid = Math.max(0, Number(state.cocoGoal.paid) + delta);
+            saveState();
+            renderCocoGoal();
+            showToast(`Devolución a Cocó actualizada: ${formatUSD(state.cocoGoal.paid)}`, 'success');
+        }
+
+        // Categories Modal
+        function openCategoriesModal() {
+            renderCategoriesList();
+            document.getElementById('categoriesModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeCategoriesModal() {
+            document.getElementById('categoriesModal').classList.add('hidden');
+        }
+
+        function renderCategoriesList() {
+            const container = document.getElementById('categoriesList');
+            container.innerHTML = state.categories.map(cat => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3.5 h-3.5 rounded-full" style="background-color: ${cat.color}"></span>
+                        <span class="text-xs font-medium text-zinc-200">${cat.name}</span>
+                    </div>
+                    ${state.categories.length > 1 ? `
+                        <button type="button" onclick="deleteCategory('${cat.id}')" class="p-1 text-zinc-500 hover:text-rose-400">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function deleteCategory(id) {
+            state.categories = state.categories.filter(c => c.id !== id);
+            saveState();
+            renderCategoriesList();
+            renderCategorySelect();
+            renderAll();
+        }
+
+        function renderCategorySelect() {
+            const select = document.getElementById('txCategory');
+            select.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        // Day Modal & Transaction CRUD
+        function openDayModal(dateStr, editTxId = null) {
+            document.getElementById('txDate').value = dateStr;
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const dateObj = new Date(y, m - 1, d);
+            document.getElementById('dayModalTitle').textContent = dateObj.toLocaleDateString('es-AR', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            renderDayTransactions(dateStr);
+            resetTxForm();
+
+            if (editTxId) {
+                const tx = state.transactions.find(t => t.id === editTxId);
+                if (tx) loadTxIntoForm(tx);
+            }
+
+            document.getElementById('dayModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeDayModal() {
+            document.getElementById('dayModal').classList.add('hidden');
+        }
+
+        function renderDayTransactions(dateStr) {
+            const list = document.getElementById('dayTransactionsList');
+            const txs = state.transactions.filter(t => t.date === dateStr);
+
+            if (txs.length === 0) {
+                list.innerHTML = `<p class="text-xs text-zinc-500 italic py-2">Sin movimientos cargados para esta fecha.</p>`;
+                return;
+            }
+
+            list.innerHTML = txs.map(tx => {
+                const isInc = tx.type === 'income';
+                const cat = getCategoryById(tx.category);
+                return `
+                    <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
+                                <p class="text-xs font-semibold text-white truncate">${tx.title}</p>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded ${tx.status === 'pending' ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300'}">
+                                    ${tx.status === 'pending' ? 'Pendiente' : 'Efectivizado'}
+                                </span>
+                            </div>
+                            <p class="text-xs font-mono font-bold mt-1 ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${isInc ? '+' : '-'}${formatARS(tx.amount)}
+                            </p>
+                            ${tx.note ? `<p class="text-[11px] text-zinc-400 mt-0.5">${tx.note}</p>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="toggleTxStatus('${tx.id}', '${dateStr}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300" title="Cambiar estado">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick='loadTxIntoForm(${JSON.stringify(tx)})' class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-indigo-400" title="Editar">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="deleteTransaction('${tx.id}', '${dateStr}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-rose-400" title="Eliminar">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setTxType(type) {
+            document.getElementById('txType').value = type;
+            const incBtn = document.getElementById('typeIncomeBtn');
+            const expBtn = document.getElementById('typeExpenseBtn');
+
+            if (type === 'income') {
+                incBtn.className = 'py-2 rounded-xl text-xs font-semibold border transition-all bg-emerald-500/15 text-emerald-300 border-emerald-500/40';
+                expBtn.className = 'py-2 rounded-xl text-xs font-semibold border transition-all bg-zinc-900 text-zinc-400 border-zinc-800';
+            } else {
+                expBtn.className = 'py-2 rounded-xl text-xs font-semibold border transition-all bg-rose-500/15 text-rose-300 border-rose-500/40';
+                incBtn.className = 'py-2 rounded-xl text-xs font-semibold border transition-all bg-zinc-900 text-zinc-400 border-zinc-800';
+            }
+        }
+
+        function loadTxIntoForm(tx) {
+            document.getElementById('txId').value = tx.id;
+            document.getElementById('txTitle').value = tx.title;
+            document.getElementById('txAmount').value = tx.amount;
+            document.getElementById('txCategory').value = tx.category;
+            document.getElementById('txStatus').value = tx.status;
+            document.getElementById('txNote').value = tx.note || '';
+            setTxType(tx.type);
+
+            document.getElementById('txFormTitle').textContent = 'Editando Movimiento';
+            document.getElementById('cancelEditTxBtn').classList.remove('hidden');
+            document.getElementById('recurrenceWrapper').classList.add('hidden');
+        }
+
+        function resetTxForm() {
+            document.getElementById('txId').value = '';
+            document.getElementById('txTitle').value = '';
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txNote').value = '';
+            document.getElementById('txStatus').value = 'pending';
+            document.getElementById('txRecurring').checked = false;
+            setTxType('expense');
+
+            document.getElementById('txFormTitle').textContent = 'Nuevo Movimiento';
+            document.getElementById('cancelEditTxBtn').classList.add('hidden');
+            document.getElementById('recurrenceWrapper').classList.remove('hidden');
+        }
+
+        function handleTxSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('txId').value;
+            const date = document.getElementById('txDate').value;
+            const type = document.getElementById('txType').value;
+            const title = document.getElementById('txTitle').value.trim();
+            const amount = parseFloat(document.getElementById('txAmount').value) || 0;
+            const category = document.getElementById('txCategory').value;
+            const status = document.getElementById('txStatus').value;
+            const note = document.getElementById('txNote').value.trim();
+            const recurring = document.getElementById('txRecurring').checked;
+
+            if (!title || amount <= 0) return;
+
+            if (id) {
+                const idx = state.transactions.findIndex(t => t.id === id);
+                if (idx !== -1) {
+                    state.transactions[idx] = { ...state.transactions[idx], type, title, amount, category, status, note };
+                }
+                showToast('Movimiento actualizado', 'success');
+            } else {
+                const baseTx = {
+                    id: 'tx_' + Date.now(),
+                    date,
+                    type,
+                    title,
+                    amount,
+                    category,
+                    status,
+                    note
+                };
+                state.transactions.push(baseTx);
+
+                if (recurring) {
+                    const [y, m, d] = date.split('-').map(Number);
+                    for (let offset = 1; offset <= 6; offset++) {
+                        const nextDate = new Date(y, (m - 1) + offset, 1);
+                        const maxDay = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+                        const safeDay = Math.min(d, maxDay);
+                        const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(safeDay).padStart(2, '0')}`;
+                        state.transactions.push({
+                            ...baseTx,
+                            id: `tx_${Date.now()}_${offset}`,
+                            date: nextDateStr,
+                            status: 'pending'
+                        });
+                    }
+                    showToast('Movimiento creado + 6 meses recurrentes', 'success');
+                } else {
+                    showToast('Movimiento guardado', 'success');
+                }
+            }
+
+            saveState();
+            renderDayTransactions(date);
+            resetTxForm();
+            renderAll();
+        }
+
+        function toggleTxStatus(id, refreshDateStr = null) {
+            const tx = state.transactions.find(t => t.id === id);
+            if (!tx) return;
+            tx.status = tx.status === 'completed' ? 'pending' : 'completed';
+            saveState();
+            if (refreshDateStr) renderDayTransactions(refreshDateStr);
+            renderAll();
+            showToast(`Estado: ${tx.status === 'completed' ? 'Efectivizado' : 'Pendiente'}`, 'info');
+        }
+
+        function deleteTransaction(id, dateStr) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            saveState();
+            renderDayTransactions(dateStr);
+            renderAll();
+            showToast('Movimiento eliminado', 'info');
+        }
+
+        // =========================================================================
+        // BACKUP & RESET
+        // =========================================================================
+        function exportBackupJSON() {
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(state, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', `gestion_anc_26_27_respaldo_${getCurrentMonthPrefix()}.json`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('Respaldo JSON descargado', 'success');
+        }
+
+        function confirmResetSheetData() {
+            loadSheet2026Data(true);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200',
+                error: 'bg-rose-950/90 border-rose-500/40 text-rose-200',
+                info: 'bg-zinc-900/95 border-indigo-500/40 text-zinc-200'
+            };
+            toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl backdrop-blur-md transition-all ${colors[type] || colors.info}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 250);
+            }, 2600);
+        }
+
+        // =========================================================================
+        // EVENT LISTENERS
+        // =========================================================================
+        function setupEventListeners() {
+            document.getElementById('prevMonthBtn').addEventListener('click', () => {
+                state.currentMonth--;
+                if (state.currentMonth < 0) {
+                    state.currentMonth = 11;
+                    state.currentYear--;
+                }
+                saveState();
+                renderAll();
+            });
+
+            document.getElementById('nextMonthBtn').addEventListener('click', () => {
+                state.currentMonth++;
+                if (state.currentMonth > 11) {
+                    state.currentMonth = 0;
+                    state.currentYear++;
+                }
+                saveState();
+                renderAll();
+            });
+
+            // Import JSON
+            document.getElementById('importJsonInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        state = { ...state, ...imported };
+                        normalizeCardsState();
+                        normalizeLoansAndRoadmapState();
+                        saveState();
+                        renderAll();
+                        showToast('Respaldo JSON importado correctamente', 'success');
+                    } catch (err) {
+                        showToast('Archivo JSON inválido', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+
+            // Manual Bar Form Submit
+            document.getElementById('manualBarForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const type = document.getElementById('mbType').value;
+                const id = document.getElementById('mbId').value;
+                const name = document.getElementById('mbName').value.trim();
+                const amount = parseFloat(document.getElementById('mbAmount').value) || 0;
+                const limit = parseFloat(document.getElementById('mbLimit').value) || 0;
+
+                if (!name) return;
+
+                if (type === 'liquidity') {
+                    state.liquidity[id].name = name;
+                    state.liquidity[id].amount = amount;
+                    state.liquidity[id].reference = limit;
+                    saveState();
+                    closeManualBarModal();
+                    renderLiquidityAndCards();
+                    lucide.createIcons();
+                    showToast('Saldo manual actualizado', 'success');
+                } else {
+                    const card = state.cards.find(c => c.id === id);
+                    if (card) {
+                        const taxRate = Math.max(0, parseFloat(document.getElementById('mbTaxRate').value) || 0);
+                        card.name = name;
+                        card.available = Math.max(0, amount);
+                        card.limit = Math.max(0, limit);
+                        card.taxRate = taxRate;
+                    }
+                    saveState();
+                    closeManualBarModal();
+                    renderAll();
+                    showToast('Tarjeta y vencimiento al 4to día hábil actualizados', 'success');
+                }
+            });
+
+            document.getElementById('mbAmount').addEventListener('input', updateCardModalPreview);
+            document.getElementById('mbLimit').addEventListener('input', updateCardModalPreview);
+            document.getElementById('mbTaxRate').addEventListener('input', updateCardModalPreview);
+
+            // Cocó Goal Form Submit
+            document.getElementById('cocoForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.cocoGoal.title = document.getElementById('cocoTitleInput').value.trim() || 'Devolución a Cocó';
+                state.cocoGoal.paid = Math.max(0, parseFloat(document.getElementById('cocoPaidInput').value) || 0);
+                state.cocoGoal.target = Math.max(1, parseFloat(document.getElementById('cocoTargetInput').value) || 2500);
+                saveState();
+                closeCocoModal();
+                renderCocoGoal();
+                showToast('Objetivo actualizado', 'success');
+            });
+
+            // Add New Loan Form Submit
+            document.getElementById('addLoanForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('newLoanName').value.trim();
+                const paidDic = Math.max(0, parseInt(document.getElementById('newLoanDicInstallment').value, 10) || 1);
+                const total = Math.max(1, parseInt(document.getElementById('newLoanTotal').value, 10) || 12);
+                const amount = Math.max(0, parseFloat(document.getElementById('newLoanAmount').value) || 0);
+                if (!name) return;
+
+                const palette = [
+                    { colorClass: 'text-sky-300', borderClass: 'border-sky-500/30' },
+                    { colorClass: 'text-rose-300', borderClass: 'border-rose-500/30' },
+                    { colorClass: 'text-teal-300', borderClass: 'border-teal-500/30' },
+                    { colorClass: 'text-amber-300', borderClass: 'border-amber-500/30' }
+                ];
+                const style = palette[state.loans.length % palette.length];
+
+                state.loans.push({
+                    id: 'loan_' + Date.now(),
+                    name,
+                    colorClass: style.colorClass,
+                    borderClass: style.borderClass,
+                    baseMonthKey: '2026-12',
+                    installmentPaidInBaseMonth: paidDic,
+                    totalInstallments: total,
+                    installmentAmount: amount
+                });
+
+                e.target.reset();
+                saveState();
+                renderLoansEditorList();
+                renderRoadmapTable();
+                lucide.createIcons();
+                showToast(`Préstamo "${name}" agregado a la Hoja de Ruta`, 'success');
+            });
+
+            // Roadmap Row Edit Submit
+            document.getElementById('roadmapForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const idx = parseInt(document.getElementById('rmIndex').value, 10);
+                if (state.roadmapPlan[idx]) {
+                    state.roadmapPlan[idx].tarjetasBase = Math.max(0, parseFloat(document.getElementById('rmTarjetas').value) || 0);
+                    state.roadmapPlan[idx].coco = Math.max(0, parseFloat(document.getElementById('rmCoco').value) || 0);
+                    state.roadmapPlan[idx].neto = Math.max(0, parseFloat(document.getElementById('rmNeto').value) || 0);
+                }
+                saveState();
+                closeRoadmapModal();
+                renderRoadmapTable();
+                showToast('Mes de Hoja de Ruta actualizado', 'success');
+            });
+
+            // New Category Submit
+            document.getElementById('newCategoryForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('newCatName').value.trim();
+                const color = document.getElementById('newCatColor').value;
+                if (!name) return;
+                state.categories.push({ id: 'cat_' + Date.now(), name, color });
+                document.getElementById('newCatName').value = '';
+                saveState();
+                renderCategoriesList();
+                renderCategorySelect();
+                lucide.createIcons();
+                showToast('Categoría agregada', 'success');
+            });
+
+            // Transaction Form Submit
+            document.getElementById('txForm').addEventListener('submit', handleTxSubmit);
+        }
+
+        // =========================================================================
+        // BOOTSTRAP
+        // =========================================================================
+        window.onload = function () {
+            initApp();
+        };
+    </script>
+</body>
+</html>
