@@ -65,7 +65,7 @@
     <header class="sticky top-0 z-30 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
             <!-- Brand & Month Selector -->
-            <div class="flex items-center gap-3 sm:gap-5">
+            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
                 <div class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                         <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
@@ -179,7 +179,7 @@
                         </span>
                     </div>
                     <div id="kpiProjectedBalance" class="text-2xl font-bold font-mono tabular-nums text-amber-300">$ 0</div>
-                    <p class="text-xs text-zinc-500 mt-1">Incluye vencimientos pendientes y tarjetas</p>
+                    <p class="text-xs text-zinc-500 mt-1">Incluye vencimientos, tarjetas y Cocó</p>
                 </div>
             </div>
 
@@ -188,7 +188,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-zinc-800">
                     <div class="flex items-center gap-2">
                         <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i>
-                        <h3 class="text-sm font-bold text-white">Desglose de Ingresos y Egresos del Mes</h3>
+                        <h3 class="text-sm font-bold text-white">Desglose Editable de Ingresos y Egresos del Mes</h3>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <button type="button" onclick="setBreakdownTab('both')" id="bdTabBoth" class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white text-xs font-medium">Ambos</button>
@@ -313,7 +313,7 @@
                             </span>
                             <div>
                                 <div class="text-xs font-semibold text-indigo-200 flex items-center gap-2 flex-wrap">
-                                    <span>Estimado Tarjetas Mes Siguiente (<span id="nextMonthCardsLabel">Dic 2026</span>)</span>
+                                    <span>Estimado Tarjetas Mes Siguiente (<span id="nextMonthCardsLabel">Ene 2027</span>)</span>
                                     <span id="nextMonthFourthBizDayBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Vto: 4to día hábil</span>
                                 </div>
                                 <p id="nextMonthCardsBreakdownText" class="text-[11px] text-zinc-400 mt-0.5">
@@ -339,7 +339,7 @@
                             </span>
                             <div>
                                 <h2 id="cocoGoalTitle" class="text-sm font-bold text-white">Devolución a Cocó</h2>
-                                <p class="text-[11px] text-zinc-400">Objetivo único en dólares (Manual)</p>
+                                <p class="text-[11px] text-zinc-400">Cada aporte se resta del saldo del mes</p>
                             </div>
                         </div>
                         <button type="button" onclick="openCocoModal()" class="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors" title="Editar monto devuelto o meta">
@@ -457,11 +457,12 @@
                         </div>
                         <p id="calendarBridgeNote" class="text-[11px] text-zinc-400 mt-0.5">Clic en cualquier día para agregar ingresos o egresos propios del mes.</p>
                     </div>
-                    <div class="flex items-center gap-3 text-[11px] text-zinc-400">
+                    <div class="flex items-center gap-3 text-[11px] text-zinc-400 flex-wrap">
                         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Ingreso</span>
                         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Egreso</span>
                         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Pendiente</span>
                         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-400"></span>Est. Tarjeta</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Cocó</span>
                     </div>
                 </div>
 
@@ -637,6 +638,7 @@
                         <input type="number" step="any" id="cocoTargetInput" required class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-mono text-white focus:outline-none focus:border-pink-500">
                     </div>
                 </div>
+                <p class="text-[11px] text-zinc-400">Cualquier diferencia sumada o restada se imputará automáticamente como egreso en el mes visible.</p>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeCocoModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300">Cancelar</button>
                     <button type="submit" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-xs font-semibold text-white">Guardar</button>
@@ -841,289 +843,108 @@
             { id: 'cat_extras', name: 'Ingresos Extras', color: '#14b8a6' },
             { id: 'cat_prestamos', name: 'Préstamos', color: '#f43f5e' },
             { id: 'cat_tarjetas', name: 'Tarjetas de Crédito', color: '#8b5cf6' },
+            { id: 'cat_coco', name: 'Devolución Cocó', color: '#ec4899' },
             { id: 'cat_servicios', name: 'Servicios & Gastos Fijos', color: '#f59e0b' },
             { id: 'cat_otros', name: 'Otros', color: '#71717a' }
         ];
 
-        // Tus 4 tarjetas reales con sus límites exactos
-        const DEFAULT_CARDS_LIST = [
-            { id: 'card_1', name: 'Galicia AMEX', available: 2500000, limit: 2500000, taxRate: 7.5 },
-            { id: 'card_2', name: 'Galicia Master', available: 2500000, limit: 2500000, taxRate: 7.5 },
-            { id: 'card_3', name: 'Naranja X', available: 375000, limit: 375000, taxRate: 7.5 },
-            { id: 'card_4', name: 'Carrefour Banco', available: 1025000, limit: 1025000, taxRate: 7.5 }
+        const BASE_CARDS_CONFIG = [
+            { id: 'card_1', name: 'Galicia AMEX', limit: 2500000, available: 2500000, taxRate: 7.5 },
+            { id: 'card_2', name: 'Galicia Master', limit: 2500000, available: 2500000, taxRate: 7.5 },
+            { id: 'card_3', name: 'Naranja X', limit: 375000, available: 375000, taxRate: 7.5 },
+            { id: 'card_4', name: 'Carrefour Banco', limit: 1025000, available: 1025000, taxRate: 7.5 }
         ];
 
-        // Préstamos reales: En Diciembre 2026 se paga Cuota 4/12 Galicia y Cuota 2/12 Naranja X (sin precancelación)
         const DEFAULT_LOANS_LIST = [
-            {
-                id: 'loan_galicia',
-                name: 'Préstamo Galicia',
-                decPaidInstallment: 4,
-                totalInstallments: 12,
-                installmentAmount: 263000
-            },
-            {
-                id: 'loan_naranja',
-                name: 'Préstamo Naranja X',
-                decPaidInstallment: 2,
-                totalInstallments: 12,
-                installmentAmount: 125000
-            }
+            { id: 'loan_galicia', name: 'Préstamo Galicia', decInstallment: 4, totalInstallments: 12, installmentAmount: 263000 },
+            { id: 'loan_naranja', name: 'Préstamo Naranja X', decInstallment: 2, totalInstallments: 12, installmentAmount: 125000 }
         ];
 
-        // Hoja de Ruta Dic 2026 -> Jun 2027 (monthOffset: 0 = Dic 2026)
-        const DEFAULT_ROADMAP_PLAN = [
-            { monthKey: '2026-12', label: 'Diciembre 2026', monthOffset: 0, cocoDebt: 3840000, netSaved: 0 },
-            { monthKey: '2027-01', label: 'Enero 2027', monthOffset: 1, cocoDebt: 3680000, netSaved: 0 },
-            { monthKey: '2027-02', label: 'Febrero 2027', monthOffset: 2, cocoDebt: 3520000, netSaved: 0 },
-            { monthKey: '2027-03', label: 'Marzo 2027', monthOffset: 3, cocoDebt: 3200000, netSaved: 474496 },
-            { monthKey: '2027-04', label: 'Abril 2027', monthOffset: 4, cocoDebt: 2720000, netSaved: 631496 },
-            { monthKey: '2027-05', label: 'Mayo 2027', monthOffset: 5, cocoDebt: 1920000, netSaved: 1018496 },
-            { monthKey: '2027-06', label: 'Junio 2027', monthOffset: 6, cocoDebt: 0, netSaved: 985496 }
+        const DEFAULT_ROADMAP_EXTRAS = [
+            { monthIndex: 0, label: 'Diciembre 2026', year: 2026, month: 11, cocoDebt: 3840000, netSaved: 0 },
+            { monthIndex: 1, label: 'Enero 2027', year: 2027, month: 0, cocoDebt: 3680000, netSaved: 0 },
+            { monthIndex: 2, label: 'Febrero 2027', year: 2027, month: 1, cocoDebt: 3520000, netSaved: 0 },
+            { monthIndex: 3, label: 'Marzo 2027', year: 2027, month: 2, cocoDebt: 3200000, netSaved: 474496 },
+            { monthIndex: 4, label: 'Abril 2027', year: 2027, month: 3, cocoDebt: 2720000, netSaved: 631496 },
+            { monthIndex: 5, label: 'Mayo 2027', year: 2027, month: 4, cocoDebt: 1920000, netSaved: 1018496 },
+            { monthIndex: 6, label: 'Junio 2027', year: 2027, month: 5, cocoDebt: 0, netSaved: 985496 }
         ];
 
-        let state = {
-            currentYear: 2026,
-            currentMonth: 11, // 0-indexed: 11 = Diciembre 2026 (arranca incluyendo la última semana de Noviembre)
-            usdToArsRate: 1200,
-            categories: [...DEFAULT_CATEGORIES],
-            liquidity: {
-                bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, reference: 2500000, currency: 'ARS' },
-                usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, reference: 2500, currency: 'USD' }
-            },
-            cards: DEFAULT_CARDS_LIST.map(c => ({ ...c })),
-            cardsHistoryByMonth: {},
-            cocoGoal: {
-                title: 'Devolución a Cocó',
-                paid: 0,
-                target: 2500
-            },
-            loans: DEFAULT_LOANS_LIST.map(l => ({ ...l })),
-            roadmapPlan: DEFAULT_ROADMAP_PLAN.map(r => ({ ...r })),
-            transactions: []
-        };
+        const INITIAL_TRANSACTIONS = [
+            // Puente final Noviembre 2026 visible dentro del inicio de Diciembre
+            { id: 'tx_nov_lela', date: '2026-11-20', type: 'income', title: 'Regalo Lela', amount: 170000, category: 'cat_extras', status: 'completed', notes: 'Ingreso puente hacia Diciembre' },
+            { id: 'tx_nov_owa', date: '2026-11-27', type: 'income', title: 'OWA', amount: 250000, category: 'cat_extras', status: 'pending', notes: 'Ingreso fin de mes' },
 
-        let listFilter = 'all';
-        let breakdownOpen = false;
-        let breakdownTab = 'both';
-        let cashflowChartInstance = null;
+            // DICIEMBRE 2026 (4to día hábil = 04/12/2026)
+            { id: 'tx_dic_sueldo', date: '2026-12-04', type: 'income', title: 'Sueldo Global Diciembre', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: 'Primer quincena' },
+            { id: 'tx_dic_tc_amex', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia AMEX (Dic)', amount: 850000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
+            { id: 'tx_dic_tc_master', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia Master (Dic)', amount: 743077, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
+            { id: 'tx_dic_tc_nx', date: '2026-12-04', type: 'expense', title: 'Vto. Naranja X (Dic)', amount: 250000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
+            { id: 'tx_dic_tc_carrefour', date: '2026-12-04', type: 'expense', title: 'Vto. Carrefour Banco (Dic)', amount: 300000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
+            { id: 'tx_dic_galicia', date: '2026-12-09', type: 'expense', title: 'Préstamo Galicia (Cuota 4/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Quedan 8 cuotas tras Dic' },
+            { id: 'tx_dic_naranja', date: '2026-12-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 2/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Quedan 10 cuotas tras Dic' },
+            { id: 'tx_dic_aguinaldo', date: '2026-12-24', type: 'income', title: 'Aguinaldo Diciembre', amount: 700000, category: 'cat_sueldo', status: 'pending', notes: 'SAC Diciembre' },
+            { id: 'tx_dic_com', date: '2026-12-24', type: 'income', title: 'Comisiones Global Diciembre', amount: 300000, category: 'cat_sueldo', status: 'pending', notes: 'Comisiones mes' },
 
-        // =========================================================================
-        // INITIALIZATION & NORMALIZATION
-        // =========================================================================
-        function initApp() {
-            let saved = localStorage.getItem(STORAGE_KEY);
-            if (!saved) {
-                loadSheet2026Data(false);
-            } else {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                    if (!state.usdToArsRate || Number(state.usdToArsRate) <= 0) state.usdToArsRate = 1200;
-                    normalizeCardsState();
-                    normalizeLoansAndRoadmapState();
-                    saveState();
-                } catch (e) {
-                    loadSheet2026Data(false);
-                }
-            }
+            // ENERO 2027
+            { id: 'tx_ene_sueldo', date: '2027-01-04', type: 'income', title: 'Sueldo Global Enero', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_ene_galicia', date: '2027-01-09', type: 'expense', title: 'Préstamo Galicia (Cuota 5/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_ene_naranja', date: '2027-01-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 3/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_ene_com', date: '2027-01-20', type: 'income', title: 'Comisiones Global Enero', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
 
-            setupEventListeners();
-            renderAll();
-        }
+            // FEBRERO 2027
+            { id: 'tx_feb_sueldo', date: '2027-02-04', type: 'income', title: 'Sueldo Global Febrero', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_feb_galicia', date: '2027-02-09', type: 'expense', title: 'Préstamo Galicia (Cuota 6/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_feb_naranja', date: '2027-02-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 4/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_feb_com', date: '2027-02-20', type: 'income', title: 'Comisiones Global Febrero', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
 
-        function normalizeCardsState() {
-            if (!state.cardsHistoryByMonth || typeof state.cardsHistoryByMonth !== 'object') {
-                state.cardsHistoryByMonth = {};
-            }
-            if (!Array.isArray(state.cards) || state.cards.length === 0) {
-                state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
-                syncCurrentMonthCardsSnapshot();
-                return;
-            }
-            const hasLegacyMP = state.cards.some(c => (c.name || '').includes('MercadoPago') || (c.name || '').includes('Tarjeta 1'));
-            if (hasLegacyMP) {
-                state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
-                syncCurrentMonthCardsSnapshot();
-                return;
-            }
-            state.cards = state.cards.map((card, idx) => {
-                const def = DEFAULT_CARDS_LIST[idx] || { limit: 1000000, taxRate: 7.5 };
-                const lim = Number(card.limit) || def.limit;
-                const avail = card.available !== undefined ? Math.max(0, Number(card.available) || 0) : lim;
-                const taxRate = card.taxRate !== undefined ? Math.max(0, Number(card.taxRate) || 0) : 7.5;
-                return {
-                    ...card,
-                    available: avail,
-                    limit: lim,
-                    taxRate
-                };
-            });
-            syncCurrentMonthCardsSnapshot();
-        }
+            // MARZO 2027
+            { id: 'tx_mar_sueldo', date: '2027-03-04', type: 'income', title: 'Sueldo Global Marzo', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_mar_galicia', date: '2027-03-09', type: 'expense', title: 'Préstamo Galicia (Cuota 7/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_mar_naranja', date: '2027-03-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 5/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_mar_com', date: '2027-03-20', type: 'income', title: 'Comisiones Global Marzo', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
 
-        function syncCurrentMonthCardsSnapshot() {
-            const key = getCurrentMonthPrefix();
-            if (!state.cardsHistoryByMonth) state.cardsHistoryByMonth = {};
-            state.cardsHistoryByMonth[key] = state.cards.map(c => ({
-                id: c.id,
-                name: c.name,
-                available: Number(c.available) || 0,
-                limit: Number(c.limit) || 0,
-                taxRate: Number(c.taxRate) ?? 7.5
-            }));
-        }
+            // ABRIL 2027
+            { id: 'tx_abr_sueldo', date: '2027-04-04', type: 'income', title: 'Sueldo Global Abril', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_abr_galicia', date: '2027-04-09', type: 'expense', title: 'Préstamo Galicia (Cuota 8/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_abr_naranja', date: '2027-04-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 6/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_abr_com', date: '2027-04-20', type: 'income', title: 'Comisiones Global Abril', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
 
-        function loadCardsForMonth(monthKey) {
-            if (!state.cardsHistoryByMonth) state.cardsHistoryByMonth = {};
-            if (Array.isArray(state.cardsHistoryByMonth[monthKey]) && state.cardsHistoryByMonth[monthKey].length > 0) {
-                state.cards = state.cardsHistoryByMonth[monthKey].map(c => ({ ...c }));
-            } else {
-                state.cards = state.cards.map(c => ({
-                    ...c,
-                    available: Number(c.limit) || 0
-                }));
-                syncCurrentMonthCardsSnapshot();
-            }
-        }
+            // MAYO 2027
+            { id: 'tx_may_sueldo', date: '2027-05-04', type: 'income', title: 'Sueldo Global Mayo', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_may_galicia', date: '2027-05-09', type: 'expense', title: 'Préstamo Galicia (Cuota 9/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_may_naranja', date: '2027-05-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 7/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_may_com', date: '2027-05-20', type: 'income', title: 'Comisiones Global Mayo', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
 
-        function normalizeLoansAndRoadmapState() {
-            if (!Array.isArray(state.loans)) {
-                state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
-            }
-            if (!Array.isArray(state.roadmapPlan) || state.roadmapPlan.length === 0) {
-                state.roadmapPlan = DEFAULT_ROADMAP_PLAN.map(r => ({ ...r }));
-            } else {
-                state.roadmapPlan = state.roadmapPlan.map((row, idx) => ({
-                    ...row,
-                    monthOffset: row.monthOffset !== undefined ? row.monthOffset : idx
-                }));
-            }
-        }
+            // JUNIO 2027
+            { id: 'tx_jun_sueldo', date: '2027-06-04', type: 'income', title: 'Sueldo Global Junio', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_jun_galicia', date: '2027-06-09', type: 'expense', title: 'Préstamo Galicia (Cuota 10/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_jun_naranja', date: '2027-06-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 8/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: '' },
+            { id: 'tx_jun_com', date: '2027-06-20', type: 'income', title: 'Comisiones Global Junio', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
+            { id: 'tx_jun_aguinaldo', date: '2027-06-24', type: 'income', title: 'Aguinaldo Junio', amount: 700000, category: 'cat_sueldo', status: 'pending', notes: 'SAC Junio' }
+        ];
 
-        function saveState() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (e) {
-                showToast('Error al guardar en el navegador', 'error');
-            }
-        }
-
-        function loadSheet2026Data(notify = true) {
-            state.currentYear = 2026;
-            state.currentMonth = 11; // Diciembre 2026 (arranca mostrando la semana final de Noviembre)
-            state.usdToArsRate = 1200;
-            state.categories = [...DEFAULT_CATEGORIES];
-            state.liquidity = {
-                bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, reference: 2500000, currency: 'ARS' },
-                usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, reference: 2500, currency: 'USD' }
-            };
-            state.cards = DEFAULT_CARDS_LIST.map(c => ({ ...c }));
-            state.cardsHistoryByMonth = {};
-            syncCurrentMonthCardsSnapshot();
-            state.cocoGoal = {
-                title: 'Devolución a Cocó',
-                paid: 0,
-                target: 2500
-            };
-            state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
-            state.roadmapPlan = DEFAULT_ROADMAP_PLAN.map(r => ({ ...r }));
-
-            state.transactions = [
-                // ÚLTIMA SEMANA DE NOVIEMBRE 2026 (Integrada al arranque de Diciembre)
-                { id: 'tx_nov_1', date: '2026-11-19', type: 'income', title: 'Dinero en Cuenta Inicial', amount: 1800000, category: 'cat_extras', status: 'completed', notes: 'Saldo inicial planilla' },
-                { id: 'tx_nov_2', date: '2026-11-19', type: 'expense', title: 'MONI', amount: 200000, category: 'cat_prestamos', status: 'completed', notes: 'Pago 19/11' },
-                { id: 'tx_nov_3', date: '2026-11-20', type: 'income', title: 'Regalo Lela (Abuela)', amount: 170000, category: 'cat_extras', status: 'completed', notes: 'Ingreso cierre Nov' },
-                { id: 'tx_nov_4', date: '2026-11-27', type: 'income', title: 'OWA', amount: 250000, category: 'cat_extras', status: 'pending', notes: 'Ingreso estimado 27/11' },
-
-                // DICIEMBRE 2026: Ingresos + Préstamos (Cuota 4/12 Galicia, Cuota 2/12 Naranja X) + Vencimientos de Tarjetas ($2.143.077 planilla)
-                { id: 'tx_dic_1', date: '2026-12-04', type: 'income', title: 'Sueldo Global Dic', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_dic_tc1', date: '2026-12-04', type: 'expense', title: 'Vto. Tarjeta Galicia AMEX (Dic)', amount: 890000, category: 'cat_tarjetas', status: 'pending', notes: 'Resumen Diciembre (4to día hábil)' },
-                { id: 'tx_dic_tc2', date: '2026-12-04', type: 'expense', title: 'Vto. Tarjeta Galicia Master (Dic)', amount: 745000, category: 'cat_tarjetas', status: 'pending', notes: 'Resumen Diciembre (4to día hábil)' },
-                { id: 'tx_dic_tc3', date: '2026-12-04', type: 'expense', title: 'Vto. Tarjeta Naranja X (Dic)', amount: 288077, category: 'cat_tarjetas', status: 'pending', notes: 'Resumen Diciembre (4to día hábil)' },
-                { id: 'tx_dic_tc4', date: '2026-12-04', type: 'expense', title: 'Vto. Tarjeta Carrefour Banco (Dic)', amount: 220000, category: 'cat_tarjetas', status: 'pending', notes: 'Resumen Diciembre (4to día hábil)' },
-                { id: 'tx_dic_2', date: '2026-12-09', type: 'expense', title: 'Préstamo Galicia (Cuota 4/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 4 de 12' },
-                { id: 'tx_dic_3', date: '2026-12-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 2/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 2 de 12' },
-                { id: 'tx_dic_4', date: '2026-12-24', type: 'income', title: 'Aguinaldo Dic', amount: 700000, category: 'cat_sueldo', status: 'pending', notes: 'SAC 2do semestre' },
-                { id: 'tx_dic_5', date: '2026-12-24', type: 'income', title: 'Comisiones Global Dic', amount: 300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // ENERO 2027
-                { id: 'tx_ene_1', date: '2027-01-04', type: 'income', title: 'Sueldo Global Enero', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_ene_2', date: '2027-01-09', type: 'expense', title: 'Préstamo Galicia (Cuota 5/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 5 de 12' },
-                { id: 'tx_ene_3', date: '2027-01-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 3/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 3 de 12' },
-                { id: 'tx_ene_4', date: '2027-01-20', type: 'income', title: 'Comisiones Global Enero', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // FEBRERO 2027
-                { id: 'tx_feb_1', date: '2027-02-04', type: 'income', title: 'Sueldo Global Febrero', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_feb_2', date: '2027-02-09', type: 'expense', title: 'Préstamo Galicia (Cuota 6/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 6 de 12' },
-                { id: 'tx_feb_3', date: '2027-02-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 4/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 4 de 12' },
-                { id: 'tx_feb_4', date: '2027-02-20', type: 'income', title: 'Comisiones Global Febrero', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // MARZO 2027
-                { id: 'tx_mar_1', date: '2027-03-04', type: 'income', title: 'Sueldo Global Marzo', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_mar_2', date: '2027-03-09', type: 'expense', title: 'Préstamo Galicia (Cuota 7/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 7 de 12' },
-                { id: 'tx_mar_3', date: '2027-03-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 5/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 5 de 12' },
-                { id: 'tx_mar_4', date: '2027-03-20', type: 'income', title: 'Comisiones Global Marzo', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // ABRIL 2027
-                { id: 'tx_abr_1', date: '2027-04-04', type: 'income', title: 'Sueldo Global Abril', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_abr_2', date: '2027-04-09', type: 'expense', title: 'Préstamo Galicia (Cuota 8/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 8 de 12' },
-                { id: 'tx_abr_3', date: '2027-04-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 6/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 6 de 12' },
-                { id: 'tx_abr_4', date: '2027-04-20', type: 'income', title: 'Comisiones Global Abril', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // MAYO 2027
-                { id: 'tx_may_1', date: '2027-05-04', type: 'income', title: 'Sueldo Global Mayo', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_may_2', date: '2027-05-09', type: 'expense', title: 'Préstamo Galicia (Cuota 9/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 9 de 12' },
-                { id: 'tx_may_3', date: '2027-05-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 7/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 7 de 12' },
-                { id: 'tx_may_4', date: '2027-05-20', type: 'income', title: 'Comisiones Global Mayo', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-
-                // JUNIO 2027
-                { id: 'tx_jun_1', date: '2027-06-04', type: 'income', title: 'Sueldo Global Junio', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_jun_2', date: '2027-06-09', type: 'expense', title: 'Préstamo Galicia (Cuota 10/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 10 de 12' },
-                { id: 'tx_jun_3', date: '2027-06-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 8/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Cuota 8 de 12' },
-                { id: 'tx_jun_4', date: '2027-06-20', type: 'income', title: 'Comisiones Global Junio', amount: 350000, category: 'cat_sueldo', status: 'pending', notes: '' },
-                { id: 'tx_jun_5', date: '2027-06-24', type: 'income', title: 'Aguinaldo Junio', amount: 700000, category: 'cat_sueldo', status: 'pending', notes: 'SAC 1er semestre' }
-            ];
-
-            saveState();
-            if (notify) {
-                renderAll();
-                showToast('Datos base Diciembre 2026 – Junio 2027 restaurados', 'success');
-            }
-        }
-
-        // =========================================================================
-        // FERIADOS ARGENTINA & CÁLCULO 4TO DÍA HÁBIL
-        // =========================================================================
-        const AR_HOLIDAYS = new Set([
-            // 2026
-            '2026-01-01', '2026-02-16', '2026-02-17', '2026-03-23', '2026-03-24',
-            '2026-04-02', '2026-04-03', '2026-05-01', '2026-05-25', '2026-06-15',
-            '2026-06-20', '2026-07-09', '2026-07-10', '2026-08-17', '2026-10-12',
-            '2026-11-23', '2026-12-07', '2026-12-08', '2026-12-25',
-            // 2027
-            '2027-01-01', '2027-02-08', '2027-02-09', '2027-03-24', '2027-03-25',
-            '2027-03-26', '2027-04-02', '2027-05-01', '2027-05-25', '2027-06-20',
-            '2027-06-21', '2027-07-09', '2027-08-16', '2027-10-11', '2027-11-22',
-            '2027-12-08', '2027-12-25'
+        // =====================================================================
+        // FERIADOS ARGENTINA 2026-2027 & CÁLCULO 4TO DÍA HÁBIL
+        // =====================================================================
+        const ARG_HOLIDAYS = new Set([
+            '2026-11-23', '2026-12-08', '2026-12-25',
+            '2027-01-01', '2027-02-08', '2027-02-09', '2027-03-24',
+            '2027-04-02', '2027-05-01', '2027-05-25', '2027-06-17',
+            '2027-06-20', '2027-07-09', '2027-08-16', '2027-10-11',
+            '2027-11-22', '2027-12-08', '2027-12-25'
         ]);
 
-        function isBusinessDayAR(year, month, day) {
-            const d = new Date(year, month, day);
-            const dow = d.getDay(); // 0 = Dom, 6 = Sáb
-            if (dow === 0 || dow === 6) return false;
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            return !AR_HOLIDAYS.has(dateStr);
-        }
-
-        function getNthBusinessDay(year, month, n = 4) {
+        function getFourthBusinessDayOfMonth(year, month) {
+            let businessDays = 0;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            let count = 0;
             for (let day = 1; day <= daysInMonth; day++) {
-                if (isBusinessDayAR(year, month, day)) {
-                    count++;
-                    if (count === n) {
-                        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateObj = new Date(year, month, day);
+                const dow = dateObj.getDay();
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (dow !== 0 && dow !== 6 && !ARG_HOLIDAYS.has(dateStr)) {
+                    businessDays++;
+                    if (businessDays === 4) {
                         return { day, dateStr };
                     }
                 }
@@ -1131,210 +952,324 @@
             return { day: 4, dateStr: `${year}-${String(month + 1).padStart(2, '0')}-04` };
         }
 
-        // =========================================================================
-        // CÁLCULOS DE TARJETAS (UTILIZADO + TAXES) Y PRÉSTAMOS
-        // =========================================================================
-        function getCardConsumptionMetrics(card) {
-            const limit = Math.max(0, Number(card.limit) || 0);
-            const available = Math.max(0, Number(card.available) || 0);
-            const used = Math.max(0, limit - available);
-            const taxRate = Math.max(0, Number(card.taxRate) ?? 7.5);
-            const taxes = Math.round(used * (taxRate / 100));
-            const estimatedNextMonth = used + taxes;
-            return { limit, available, used, taxRate, taxes, estimatedNextMonth };
-        }
+        // =====================================================================
+        // STATE MANAGEMENT
+        // =====================================================================
+        let state = {
+            currentYear: 2026,
+            currentMonth: 11, // Diciembre 2026 por defecto
+            usdToArsRate: 1200,
+            filter: 'all',
+            breakdownOpen: false,
+            breakdownTab: 'both',
+            categories: DEFAULT_CATEGORIES,
+            transactions: INITIAL_TRANSACTIONS,
+            liquidity: {
+                bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
+                usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
+            },
+            cardsHistoryByMonth: {
+                '2026-12': BASE_CARDS_CONFIG.map(c => ({ ...c }))
+            },
+            overriddenCardBills: {},
+            cocoGoal: {
+                title: 'Devolución a Cocó',
+                paid: 0,
+                target: 2500,
+                paymentsByMonth: {}
+            },
+            loans: DEFAULT_LOANS_LIST.map(l => ({ ...l })),
+            roadmapExtras: DEFAULT_ROADMAP_EXTRAS.map(r => ({ ...r }))
+        };
 
-        function getTotalCardsEstimatedNextMonth() {
-            return state.cards.reduce((acc, card) => acc + getCardConsumptionMetrics(card).estimatedNextMonth, 0);
-        }
-
-        function getTotalCardsUsedFromBars() {
-            return state.cards.reduce((acc, card) => acc + getCardConsumptionMetrics(card).used, 0);
-        }
-
-        function setGlobalCardTax(rate) {
-            state.cards.forEach(c => { c.taxRate = rate; });
-            syncCurrentMonthCardsSnapshot();
-            saveState();
-            renderAll();
-            showToast(`Taxes estimados de tarjetas ajustados al ${rate}%`, 'info');
-        }
-
-        function getLoanSnapshotForMonth(loan, monthOffset) {
-            const decPaid = Math.max(1, Number(loan.decPaidInstallment) || 1);
-            const total = Math.max(decPaid, Number(loan.totalInstallments) || 12);
-            const amt = Math.max(0, Number(loan.installmentAmount) || 0);
-
-            const paidCount = Math.min(total, decPaid + monthOffset);
-            const remainingInstallments = Math.max(0, total - paidCount);
-            const remainingBalance = remainingInstallments * amt;
-
-            return {
-                paidCount,
-                total,
-                remainingInstallments,
-                remainingBalance,
-                installmentAmount: amt,
-                isFinished: remainingInstallments === 0
-            };
-        }
-
-        function getTotalLoansRemainingForMonth(monthOffset) {
-            return state.loans.reduce((sum, loan) => sum + getLoanSnapshotForMonth(loan, monthOffset).remainingBalance, 0);
-        }
-
-        // =========================================================================
-        // FORMATTING & HELPERS
-        // =========================================================================
-        function formatARS(num) {
-            const val = Number(num) || 0;
-            return '$ ' + Math.round(val).toLocaleString('es-AR');
-        }
-
-        function formatUSD(num) {
-            const val = Number(num) || 0;
-            return 'USD ' + val.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        }
+        let cashflowChartInstance = null;
 
         function getCurrentMonthPrefix() {
             const m = String(state.currentMonth + 1).padStart(2, '0');
             return `${state.currentYear}-${m}`;
         }
 
-        function getMonthTransactions() {
-            const prefix = getCurrentMonthPrefix();
-            // En Diciembre 2026 incluimos también la semana final de Noviembre (20 al 30 de Nov: Regalo Lela + OWA)
-            if (state.currentYear === 2026 && state.currentMonth === 11) {
-                return state.transactions.filter(tx =>
-                    tx.date.startsWith('2026-12') || (tx.date >= '2026-11-20' && tx.date <= '2026-11-30')
-                );
-            }
-            return state.transactions.filter(tx => tx.date.startsWith(prefix));
+        function getPrevYearMonth(year, month) {
+            return month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
         }
 
-        function getCategoryById(id) {
-            return state.categories.find(c => c.id === id) || { id: 'cat_otros', name: 'Otros', color: '#71717a' };
+        function getNextYearMonth(year, month) {
+            return month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 };
         }
 
-        function getNextMonthInfo(year, month) {
-            let nextMonth = month + 1;
-            let nextYear = year;
-            if (nextMonth > 11) {
-                nextMonth = 0;
-                nextYear++;
+        function getCardsForMonth(year, month) {
+            const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+            if (!state.cardsHistoryByMonth) state.cardsHistoryByMonth = {};
+            if (!state.cardsHistoryByMonth[key]) {
+                state.cardsHistoryByMonth[key] = BASE_CARDS_CONFIG.map(c => ({ ...c }));
             }
-            const monthKey = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}`;
-            const label = new Date(nextYear, nextMonth, 1).toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
-            return { year: nextYear, month: nextMonth, monthKey, label };
+            return state.cardsHistoryByMonth[key];
+        }
+
+        function computeCardEstimate(card) {
+            const limit = Math.max(0, Number(card.limit) || 0);
+            const available = Math.max(0, Number(card.available) || 0);
+            const taxRate = Math.max(0, Number(card.taxRate) ?? 7.5);
+            const used = Math.max(0, limit - available);
+            const taxes = Math.round(used * (taxRate / 100));
+            const nextBill = used + taxes;
+            return { limit, available, taxRate, used, taxes, nextBill };
         }
 
         function getProjectedCardItemsForMonth(year, month) {
-            let prevMonth = month - 1;
-            let prevYear = year;
-            if (prevMonth < 0) {
-                prevMonth = 11;
-                prevYear--;
-            }
+            const prev = getPrevYearMonth(year, month);
+            const prevKey = `${prev.year}-${String(prev.month + 1).padStart(2, '0')}`;
+            const prevCards = (state.cardsHistoryByMonth && state.cardsHistoryByMonth[prevKey]) || [];
+            const fourthBiz = getFourthBusinessDayOfMonth(year, month);
+            const overrides = state.overriddenCardBills || {};
 
-            const prevKey = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
-            const activeKey = getCurrentMonthPrefix();
-
-            let sourceCards = [];
-            if (state.cardsHistoryByMonth && Array.isArray(state.cardsHistoryByMonth[prevKey])) {
-                sourceCards = state.cardsHistoryByMonth[prevKey];
-            } else if (prevKey === activeKey) {
-                sourceCards = state.cards;
-            } else {
-                return [];
-            }
-
-            const fourthBiz = getNthBusinessDay(year, month, 4);
-            const dayPadded = String(fourthBiz.day).padStart(2, '0');
-            const prevMonthLabel = new Date(prevYear, prevMonth, 1).toLocaleDateString('es-AR', { month: 'short' });
-
-            return sourceCards
+            return prevCards
                 .map(card => {
-                    const metrics = getCardConsumptionMetrics(card);
+                    const calc = computeCardEstimate(card);
+                    const overrideKey = `${prevKey}_${card.id}`;
+                    const hasOverride = Object.prototype.hasOwnProperty.call(overrides, overrideKey);
+                    const finalAmount = hasOverride ? Math.max(0, Number(overrides[overrideKey]) || 0) : calc.nextBill;
+
                     return {
-                        id: `est_card_${prevKey}_${card.id}`,
+                        id: `auto_card_${prevKey}_${card.id}`,
                         cardId: card.id,
                         sourceMonthKey: prevKey,
                         date: fourthBiz.dateStr,
-                        day: dayPadded,
                         type: 'expense',
+                        title: `Vto. ${card.name} (Est. +${calc.taxRate}% tax)`,
+                        amount: finalAmount,
+                        used: calc.used,
+                        taxes: calc.taxes,
+                        taxRate: calc.taxRate,
                         category: 'cat_tarjetas',
                         status: 'pending',
-                        title: `Vto. ${card.name} (Consumo ${prevMonthLabel} +${metrics.taxRate}%)`,
-                        amount: metrics.estimatedNextMonth,
-                        used: metrics.used,
-                        taxRate: metrics.taxRate,
-                        available: metrics.available,
-                        limit: metrics.limit,
+                        notes: `Calculado sobre consumo mes anterior (${formatARS(calc.used)} + ${calc.taxRate}% taxes) · 4to día hábil`,
                         isAutoCardEstimate: true
                     };
                 })
                 .filter(item => item.amount > 0);
         }
 
-        // =========================================================================
-        // RENDERING PIPELINE
-        // =========================================================================
-        function renderAll() {
-            renderHeaderMonth();
-            renderKPIs();
-            renderBreakdownPanels();
-            renderLiquidityAndCards();
-            renderCocoGoal();
-            renderRoadmapTable();
-            renderCalendar();
-            renderMonthMovementsList();
-            renderChart();
-            renderCategorySelect();
-            lucide.createIcons();
+        function getCocoExpenseItemForMonth(year, month) {
+            const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+            const paymentsMap = (state.cocoGoal && state.cocoGoal.paymentsByMonth) || {};
+            const usdPaidThisMonth = Math.max(0, Number(paymentsMap[monthKey]) || 0);
+            if (usdPaidThisMonth <= 0) return null;
+
+            const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+            const arsAmount = Math.round(usdPaidThisMonth * usdRate);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            const dayNum = (today.getFullYear() === year && today.getMonth() === month)
+                ? Math.min(daysInMonth, today.getDate())
+                : daysInMonth;
+            const dateStr = `${monthKey}-${String(dayNum).padStart(2, '0')}`;
+
+            return {
+                id: `auto_coco_${monthKey}`,
+                monthKey,
+                date: dateStr,
+                type: 'expense',
+                title: `${state.cocoGoal.title || 'Devolución a Cocó'} (${formatUSD(usdPaidThisMonth)} · cotiz. ${formatARS(usdRate)})`,
+                amount: arsAmount,
+                usdPaid: usdPaidThisMonth,
+                category: 'cat_coco',
+                status: 'completed',
+                notes: 'Egreso automático por devolución a Cocó',
+                isAutoCocoPayment: true
+            };
         }
 
-        function renderHeaderMonth() {
-            const dateObj = new Date(state.currentYear, state.currentMonth, 1);
-            const label = dateObj.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
-            document.getElementById('currentMonthLabel').textContent = label;
-            const rateInput = document.getElementById('usdRateInput');
-            if (rateInput && document.activeElement !== rateInput) {
-                rateInput.value = state.usdToArsRate || 1200;
+        function syncCocoGoalTotalPaid() {
+            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
+            const totalPaid = Object.values(state.cocoGoal.paymentsByMonth).reduce((sum, v) => sum + Math.max(0, Number(v) || 0), 0);
+            state.cocoGoal.paid = Math.round(totalPaid * 100) / 100;
+        }
+
+        function normalizeState() {
+            if (!Array.isArray(state.categories) || state.categories.length === 0) {
+                state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+            }
+            if (!state.categories.some(c => c.id === 'cat_coco')) {
+                state.categories.push({ id: 'cat_coco', name: 'Devolución Cocó', color: '#ec4899' });
+            }
+            if (!Array.isArray(state.transactions)) {
+                state.transactions = INITIAL_TRANSACTIONS.map(t => ({ ...t }));
+            }
+            if (!state.usdToArsRate || Number(state.usdToArsRate) <= 0) {
+                state.usdToArsRate = 1200;
+            }
+            if (!state.liquidity || !state.liquidity.bank || !state.liquidity.usdt) {
+                state.liquidity = {
+                    bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
+                    usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
+                };
+            }
+            if (!state.cardsHistoryByMonth || typeof state.cardsHistoryByMonth !== 'object') {
+                state.cardsHistoryByMonth = {
+                    '2026-12': BASE_CARDS_CONFIG.map(c => ({ ...c }))
+                };
+            }
+            if (!state.overriddenCardBills || typeof state.overriddenCardBills !== 'object') {
+                state.overriddenCardBills = {};
+            }
+            if (!state.cocoGoal || typeof state.cocoGoal !== 'object') {
+                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
+            }
+            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
+                state.cocoGoal.paymentsByMonth = {};
+                const initialPaid = Math.max(0, Number(state.cocoGoal.paid) || 0);
+                if (initialPaid > 0) {
+                    state.cocoGoal.paymentsByMonth[getCurrentMonthPrefix()] = initialPaid;
+                }
+            }
+            if (!Array.isArray(state.loans)) {
+                state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
+            }
+            if (!Array.isArray(state.roadmapExtras) || state.roadmapExtras.length === 0) {
+                state.roadmapExtras = DEFAULT_ROADMAP_EXTRAS.map(r => ({ ...r }));
             }
         }
 
-        function renderKPIs() {
-            const txs = getMonthTransactions();
-            const projectedCards = getProjectedCardItemsForMonth(state.currentYear, state.currentMonth);
-            let incomeCompleted = 0, incomePending = 0;
-            let expenseCompleted = 0, expensePending = 0;
+        function loadState() {
+            try {
+                let raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    for (const oldKey of LEGACY_STORAGE_KEYS) {
+                        const legacy = localStorage.getItem(oldKey);
+                        if (legacy) {
+                            raw = legacy;
+                            break;
+                        }
+                    }
+                }
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    state = { ...state, ...parsed };
+                }
+            } catch (e) {
+                console.warn('Error leyendo localStorage:', e);
+            }
+            normalizeState();
+            saveState();
+        }
 
-            txs.forEach(tx => {
-                const amt = Number(tx.amount) || 0;
-                if (tx.type === 'income') {
-                    if (tx.status === 'completed') incomeCompleted += amt;
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Error guardando estado:', e);
+            }
+        }
+
+        // =====================================================================
+        // FORMATTING HELPERS
+        // =====================================================================
+        function formatARS(num) {
+            const val = Math.round(Number(num) || 0);
+            const sign = val < 0 ? '-' : '';
+            return `${sign}$ ${Math.abs(val).toLocaleString('es-AR')}`;
+        }
+
+        function formatUSD(num) {
+            const val = Number(num) || 0;
+            return `USD ${val.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+        }
+
+        function getCategoryById(id) {
+            return state.categories.find(c => c.id === id) || { id: 'cat_otros', name: 'Otros', color: '#71717a' };
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
+                error: 'bg-rose-950/95 border-rose-500/40 text-rose-200',
+                info: 'bg-zinc-900/95 border-zinc-700 text-zinc-200'
+            };
+            const el = document.createElement('div');
+            el.className = `pointer-events-auto px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl backdrop-blur-md transition-all duration-300 ${colors[type] || colors.info}`;
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        }
+
+        // =====================================================================
+        // DATA QUERIES FOR CURRENT MONTH
+        // =====================================================================
+        function getMonthTransactions() {
+            const prefix = getCurrentMonthPrefix();
+            const cocoItem = getCocoExpenseItemForMonth(state.currentYear, state.currentMonth);
+            let list = [];
+            if (state.currentYear === 2026 && state.currentMonth === 11) {
+                list = state.transactions.filter(tx =>
+                    tx.date.startsWith('2026-12') || (tx.date >= '2026-11-20' && tx.date <= '2026-11-30')
+                );
+            } else {
+                list = state.transactions.filter(tx => tx.date.startsWith(prefix));
+            }
+            return cocoItem ? [...list, cocoItem] : list;
+        }
+
+        function getAllMonthExpensesIncludingCards(year, month) {
+            const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+            let baseList = [];
+            if (year === 2026 && month === 11) {
+                baseList = state.transactions.filter(tx =>
+                    tx.date.startsWith('2026-12') || (tx.date >= '2026-11-20' && tx.date <= '2026-11-30')
+                );
+            } else {
+                baseList = state.transactions.filter(tx => tx.date.startsWith(prefix));
+            }
+            const projectedCards = getProjectedCardItemsForMonth(year, month);
+            const cocoItem = getCocoExpenseItemForMonth(year, month);
+            return [...baseList, ...projectedCards, ...(cocoItem ? [cocoItem] : [])];
+        }
+
+        // =====================================================================
+        // RENDER: TOP HEADER & KPIS
+        // =====================================================================
+        function renderHeader() {
+            const dateObj = new Date(state.currentYear, state.currentMonth, 1);
+            const label = dateObj.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+            document.getElementById('currentMonthLabel').textContent = label;
+            document.getElementById('usdRateInput').value = state.usdToArsRate;
+        }
+
+        function renderKPIs() {
+            const allItems = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
+
+            let incomeTotal = 0;
+            let incomeCompleted = 0;
+            let incomePending = 0;
+            let expenseTotal = 0;
+            let expenseCompleted = 0;
+            let expensePending = 0;
+
+            allItems.forEach(item => {
+                const amt = Number(item.amount) || 0;
+                if (item.type === 'income') {
+                    incomeTotal += amt;
+                    if (item.status === 'completed') incomeCompleted += amt;
                     else incomePending += amt;
                 } else {
-                    if (tx.status === 'completed') expenseCompleted += amt;
+                    expenseTotal += amt;
+                    if (item.status === 'completed') expenseCompleted += amt;
                     else expensePending += amt;
                 }
             });
 
-            const cardsFromPrevMonthTotal = projectedCards.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
-            expensePending += cardsFromPrevMonthTotal;
-
-            const totalIncome = incomeCompleted + incomePending;
-            const totalExpense = expenseCompleted + expensePending;
             const realBalance = incomeCompleted - expenseCompleted;
-            const projectedBalance = totalIncome - totalExpense;
+            const projectedBalance = incomeTotal - expenseTotal;
 
-            document.getElementById('kpiIncomeTotal').textContent = formatARS(totalIncome);
-            document.getElementById('kpiIncomeBreakdown').textContent = `Cobrado: ${formatARS(incomeCompleted)} · Pend: ${formatARS(incomePending)}`;
+            document.getElementById('kpiIncomeTotal').textContent = formatARS(incomeTotal);
+            document.getElementById('kpiIncomeBreakdown').textContent = `Cobrado: ${formatARS(incomeCompleted)} · Pendiente: ${formatARS(incomePending)}`;
 
-            document.getElementById('kpiExpenseTotal').textContent = formatARS(totalExpense);
-            document.getElementById('kpiExpenseBreakdown').textContent = cardsFromPrevMonthTotal > 0
-                ? `Pagado: ${formatARS(expenseCompleted)} · Pend: ${formatARS(expensePending)} (incl. ${formatARS(cardsFromPrevMonthTotal)} tarj.)`
-                : `Pagado: ${formatARS(expenseCompleted)} · Pend: ${formatARS(expensePending)}`;
+            document.getElementById('kpiExpenseTotal').textContent = formatARS(expenseTotal);
+            document.getElementById('kpiExpenseBreakdown').textContent = `Pagado: ${formatARS(expenseCompleted)} · Pendiente: ${formatARS(expensePending)}`;
 
             const realEl = document.getElementById('kpiRealBalance');
             realEl.textContent = formatARS(realBalance);
@@ -1345,275 +1280,208 @@
             projEl.className = `text-2xl font-bold font-mono tabular-nums ${projectedBalance >= 0 ? 'text-amber-300' : 'text-rose-400'}`;
         }
 
+        // =====================================================================
+        // RENDER: BREAKDOWN PANEL & SIDEBAR SUMMARY
+        // =====================================================================
         function toggleBreakdownPanel(tab = null) {
-            const panel = document.getElementById('breakdownPanel');
-            if (!panel) return;
             if (tab) {
-                if (breakdownOpen && breakdownTab === tab) {
-                    breakdownOpen = false;
+                if (state.breakdownOpen && state.breakdownTab === tab) {
+                    state.breakdownOpen = false;
                 } else {
-                    breakdownOpen = true;
-                    breakdownTab = tab;
+                    state.breakdownOpen = true;
+                    state.breakdownTab = tab;
                 }
             } else {
-                breakdownOpen = !breakdownOpen;
+                state.breakdownOpen = !state.breakdownOpen;
             }
-            panel.classList.toggle('hidden', !breakdownOpen);
-            if (breakdownOpen) {
-                renderBreakdownPanels();
-                lucide.createIcons();
-            }
+            renderBreakdownSection();
         }
 
         function openBreakdownAndScroll() {
-            breakdownOpen = true;
-            breakdownTab = 'both';
+            state.breakdownOpen = true;
+            state.breakdownTab = 'both';
+            renderBreakdownSection();
             const panel = document.getElementById('breakdownPanel');
-            if (panel) {
-                panel.classList.remove('hidden');
-                renderBreakdownPanels();
-                lucide.createIcons();
-                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function setBreakdownTab(tab) {
-            breakdownTab = tab;
-            breakdownOpen = true;
-            document.getElementById('breakdownPanel').classList.remove('hidden');
-            renderBreakdownPanels();
-            lucide.createIcons();
+            state.breakdownTab = tab;
+            state.breakdownOpen = true;
+            renderBreakdownSection();
         }
 
-        function renderBreakdownPanels() {
-            const txs = getMonthTransactions();
-            const projectedCards = getProjectedCardItemsForMonth(state.currentYear, state.currentMonth);
-            const allExpenseItems = [...txs.filter(t => t.type === 'expense'), ...projectedCards];
-            const allIncomeItems = txs.filter(t => t.type === 'income');
+        function renderBreakdownSection() {
+            const panel = document.getElementById('breakdownPanel');
+            const content = document.getElementById('breakdownPanelContent');
 
-            const groupByCategory = (items) => {
-                const map = new Map();
-                items.forEach(item => {
-                    const cat = getCategoryById(item.category);
-                    if (!map.has(cat.id)) {
-                        map.set(cat.id, { category: cat, total: 0, items: [] });
-                    }
-                    const entry = map.get(cat.id);
-                    entry.total += Number(item.amount) || 0;
-                    entry.items.push(item);
-                });
-                return Array.from(map.values()).sort((a, b) => b.total - a.total);
-            };
-
-            const incomeGroups = groupByCategory(allIncomeItems);
-            const expenseGroups = groupByCategory(allExpenseItems);
-            const totalInc = allIncomeItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
-            const totalExp = allExpenseItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
-
-            const sidebarEl = document.getElementById('sidebarCategoryBreakdown');
-            if (sidebarEl) {
-                if (incomeGroups.length === 0 && expenseGroups.length === 0) {
-                    sidebarEl.innerHTML = `<p class="text-xs text-zinc-500 italic">Sin movimientos en este mes.</p>`;
-                } else {
-                    const topExpHtml = expenseGroups.map(g => {
-                        const pct = totalExp > 0 ? Math.round((g.total / totalExp) * 100) : 0;
-                        return `
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-zinc-300 flex items-center gap-1.5 truncate">
-                                        <span class="w-2 h-2 rounded-full shrink-0" style="background-color:${g.category.color}"></span>
-                                        <span class="truncate">${g.category.name}</span>
-                                    </span>
-                                    <span class="font-mono text-rose-300 shrink-0">-${formatARS(g.total)} <span class="text-zinc-500">(${pct}%)</span></span>
-                                </div>
-                                <div class="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full" style="width:${pct}%; background-color:${g.category.color}"></div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    const topIncHtml = incomeGroups.map(g => {
-                        const pct = totalInc > 0 ? Math.round((g.total / totalInc) * 100) : 0;
-                        return `
-                            <div class="flex items-center justify-between text-xs py-0.5">
-                                <span class="text-zinc-300 flex items-center gap-1.5 truncate">
-                                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color:${g.category.color}"></span>
-                                    <span class="truncate">${g.category.name}</span>
-                                </span>
-                                <span class="font-mono text-emerald-400 shrink-0">+${formatARS(g.total)} <span class="text-zinc-500">(${pct}%)</span></span>
-                            </div>
-                        `;
-                    }).join('');
-
-                    sidebarEl.innerHTML = `
-                        ${incomeGroups.length > 0 ? `
-                            <div class="pb-2 border-b border-zinc-800/80 space-y-1">
-                                <div class="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">Ingresos (${formatARS(totalInc)})</div>
-                                ${topIncHtml}
-                            </div>
-                        ` : ''}
-                        ${expenseGroups.length > 0 ? `
-                            <div class="space-y-2">
-                                <div class="text-[10px] uppercase tracking-wider text-rose-400 font-semibold">Egresos (${formatARS(totalExp)})</div>
-                                ${topExpHtml}
-                            </div>
-                        ` : ''}
-                    `;
-                }
-            }
-
-            const tabBtns = [
-                { id: 'bdTabBoth', key: 'both' },
-                { id: 'bdTabIncome', key: 'income' },
-                { id: 'bdTabExpense', key: 'expense' }
-            ];
-            tabBtns.forEach(b => {
-                const el = document.getElementById(b.id);
-                if (el) {
-                    el.className = breakdownTab === b.key
+            ['both', 'income', 'expense'].forEach(t => {
+                const btn = document.getElementById(`bdTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                if (btn) {
+                    btn.className = state.breakdownTab === t
                         ? 'px-2.5 py-1 rounded-lg bg-zinc-800 text-white text-xs font-medium'
                         : 'px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white text-xs font-medium';
                 }
             });
 
-            const contentEl = document.getElementById('breakdownPanelContent');
-            if (!contentEl) return;
+            if (!state.breakdownOpen) {
+                panel.classList.add('hidden');
+            } else {
+                panel.classList.remove('hidden');
+                const allItems = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
+                const incomes = allItems.filter(i => i.type === 'income');
+                const expenses = allItems.filter(i => i.type === 'expense');
 
-            const renderGroupColumn = (title, groups, total, isIncome) => {
-                const accent = isIncome ? 'text-emerald-400' : 'text-rose-400';
-                const sign = isIncome ? '+' : '-';
-                if (groups.length === 0) {
-                    return `
-                        <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold uppercase tracking-wider ${accent}">${title}</span>
-                                <span class="text-xs font-mono font-bold ${accent}">${formatARS(0)}</span>
-                            </div>
-                            <p class="text-xs text-zinc-500 italic">Sin movimientos registrados en este mes.</p>
-                        </div>
-                    `;
-                }
+                const renderColumn = (title, items, isIncome) => {
+                    const total = items.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                    const grouped = {};
+                    items.forEach(item => {
+                        const cat = getCategoryById(item.category);
+                        if (!grouped[cat.id]) grouped[cat.id] = { cat, total: 0, items: [] };
+                        grouped[cat.id].total += Number(item.amount) || 0;
+                        grouped[cat.id].items.push(item);
+                    });
 
-                const groupsHtml = groups.map(g => {
-                    const pct = total > 0 ? Math.round((g.total / total) * 100) : 0;
-                    const itemsList = g.items.map(it => {
-                        const day = it.date.split('-')[2];
-                        const statusBadge = it.isAutoCardEstimate
-                            ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300">Auto mes ant.</span>'
-                            : it.status === 'completed'
-                                ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300">Efectivizado</span>'
-                                : '<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-300">Pendiente</span>';
+                    const groupsHtml = Object.values(grouped).sort((a, b) => b.total - a.total).map(g => {
+                        const pct = total > 0 ? Math.round((g.total / total) * 100) : 0;
+                        const itemsList = g.items.map(it => {
+                            const day = it.date.split('-')[2];
+                            const statusBadge = it.isAutoCardEstimate
+                                ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300">Auto mes ant.</span>'
+                                : it.isAutoCocoPayment
+                                    ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-pink-500/15 text-pink-300">Devolución Cocó</span>'
+                                    : it.status === 'completed'
+                                        ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300">Efectivizado</span>'
+                                        : '<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-300">Pendiente</span>';
 
-                        const safeTitle = String(it.title || '').replace(/'/g, "\\'");
-                        const editActionAttr = it.isAutoCardEstimate
-                            ? `onchange="overrideAutoCardEstimate('${it.cardId}', '${it.sourceMonthKey}', '${it.date}', '${safeTitle}', this.value)"`
-                            : `onchange="updateTransactionAmountInline('${it.id}', this.value)"`;
+                            const safeTitle = String(it.title || '').replace(/'/g, "\\'");
+                            const editActionAttr = it.isAutoCardEstimate
+                                ? `onchange="overrideAutoCardEstimate('${it.cardId}', '${it.sourceMonthKey}', '${it.date}', '${safeTitle}', this.value)"`
+                                : it.isAutoCocoPayment
+                                    ? `onchange="updateCocoPaymentFromBreakdown('${it.monthKey}', this.value)"`
+                                    : `onchange="updateTransactionAmountInline('${it.id}', this.value)"`;
 
-                        const deleteBtnHtml = it.isAutoCardEstimate
-                            ? `<button type="button" onclick="overrideAutoCardEstimate('${it.cardId}', '${it.sourceMonthKey}', '${it.date}', '${safeTitle}', 0)" class="p-1 rounded bg-zinc-900 hover:bg-rose-950/70 text-zinc-500 hover:text-rose-400 transition-colors" title="Quitar de este mes">
-                                    <i data-lucide="x" class="w-3 h-3"></i>
-                               </button>`
-                            : `<button type="button" onclick="deleteTxFromBreakdown('${it.id}')" class="p-1 rounded bg-zinc-900 hover:bg-rose-950/70 text-zinc-500 hover:text-rose-400 transition-colors" title="Eliminar movimiento">
-                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
-                               </button>`;
+                            const deleteBtnHtml = it.isAutoCardEstimate
+                                ? `<button type="button" onclick="overrideAutoCardEstimate('${it.cardId}', '${it.sourceMonthKey}', '${it.date}', '${safeTitle}', 0)" class="p-1 rounded bg-zinc-900 hover:bg-rose-950/70 text-zinc-500 hover:text-rose-400 transition-colors" title="Quitar de este mes">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                   </button>`
+                                : it.isAutoCocoPayment
+                                    ? `<button type="button" onclick="updateCocoPaymentFromBreakdown('${it.monthKey}', 0)" class="p-1 rounded bg-zinc-900 hover:bg-rose-950/70 text-zinc-500 hover:text-rose-400 transition-colors" title="Quitar devolución de este mes">
+                                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                   </button>`
+                                    : `<button type="button" onclick="deleteTxFromBreakdown('${it.id}')" class="p-1 rounded bg-zinc-900 hover:bg-rose-950/70 text-zinc-500 hover:text-rose-400 transition-colors" title="Eliminar movimiento">
+                                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                   </button>`;
+
+                            return `
+                                <div class="flex items-center justify-between gap-2 text-[11px] py-1.5 pl-3 border-l border-zinc-800">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="font-mono text-zinc-500">${day}</span>
+                                        <span class="text-zinc-200 truncate">${it.title}</span>
+                                        ${statusBadge}
+                                    </div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <span class="text-zinc-500 font-mono text-[10px]">$</span>
+                                        <input type="number" step="any" value="${Math.round(it.amount)}" ${editActionAttr}
+                                            class="w-24 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-600 focus:border-indigo-500 text-right font-mono text-xs ${isIncome ? 'text-emerald-400' : 'text-rose-400'} focus:outline-none">
+                                        ${deleteBtnHtml}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
 
                         return `
-                            <div class="flex items-center justify-between gap-2 text-[11px] py-1.5 pl-3 border-l border-zinc-800 hover:bg-zinc-900/50 rounded-r-lg pr-1">
-                                <div class="flex items-center gap-1.5 min-w-0">
-                                    <span class="font-mono text-zinc-500 shrink-0">Día ${day}</span>
-                                    <span class="text-zinc-200 truncate" title="${it.title}">${it.title}</span>
-                                    ${statusBadge}
+                            <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-xs font-semibold text-zinc-200">
+                                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${g.cat.color}"></span>
+                                        ${g.cat.name}
+                                    </span>
+                                    <span class="text-xs font-mono font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">
+                                        ${formatARS(g.total)} <span class="text-zinc-500 font-normal">(${pct}%)</span>
+                                    </span>
                                 </div>
-                                <div class="flex items-center gap-1.5 shrink-0">
-                                    <span class="font-mono ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${sign}$</span>
-                                    <input type="number" step="any" min="0" value="${Math.round(Number(it.amount) || 0)}" ${editActionAttr}
-                                        class="w-24 sm:w-28 px-2 py-0.5 rounded-lg bg-zinc-950 border border-zinc-700/80 hover:border-indigo-500/60 focus:border-indigo-400 focus:outline-none text-right font-mono font-semibold text-white">
-                                    ${deleteBtnHtml}
-                                </div>
+                                <div class="space-y-0.5">${itemsList}</div>
                             </div>
                         `;
                     }).join('');
 
                     return `
-                        <div class="p-3 rounded-xl bg-zinc-900/90 border border-zinc-800/90 space-y-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-xs font-semibold text-white flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color:${g.category.color}"></span>
-                                    ${g.category.name}
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between px-1">
+                                <span class="text-xs font-bold uppercase tracking-wider ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${title}</span>
+                                <span class="text-sm font-mono font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${formatARS(total)}</span>
+                            </div>
+                            ${groupsHtml || `<p class="text-xs text-zinc-500 italic px-1">Sin registros en este mes.</p>`}
+                        </div>
+                    `;
+                };
+
+                if (state.breakdownTab === 'income') {
+                    content.className = 'grid grid-cols-1 gap-4';
+                    content.innerHTML = renderColumn('Ingresos del Mes', incomes, true);
+                } else if (state.breakdownTab === 'expense') {
+                    content.className = 'grid grid-cols-1 gap-4';
+                    content.innerHTML = renderColumn('Egresos & Vencimientos del Mes', expenses, false);
+                } else {
+                    content.className = 'grid grid-cols-1 lg:grid-cols-2 gap-4';
+                    content.innerHTML = renderColumn('Ingresos del Mes', incomes, true) + renderColumn('Egresos & Vencimientos del Mes', expenses, false);
+                }
+            }
+
+            // Sidebar Category Breakdown
+            const sidebarContainer = document.getElementById('sidebarCategoryBreakdown');
+            const allExpenses = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth).filter(i => i.type === 'expense');
+            const totalExp = allExpenses.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+            const catTotals = {};
+            allExpenses.forEach(item => {
+                const cat = getCategoryById(item.category);
+                if (!catTotals[cat.id]) catTotals[cat.id] = { cat, total: 0 };
+                catTotals[cat.id].total += Number(item.amount) || 0;
+            });
+
+            const sortedCats = Object.values(catTotals).sort((a, b) => b.total - a.total);
+            if (sortedCats.length === 0) {
+                sidebarContainer.innerHTML = `<p class="text-xs text-zinc-500 italic">Sin egresos registrados este mes.</p>`;
+            } else {
+                sidebarContainer.innerHTML = sortedCats.map(entry => {
+                    const pct = totalExp > 0 ? Math.round((entry.total / totalExp) * 100) : 0;
+                    return `
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="flex items-center gap-1.5 text-zinc-300">
+                                    <span class="w-2 h-2 rounded-full" style="background-color: ${entry.cat.color}"></span>
+                                    ${entry.cat.name}
                                 </span>
-                                <span class="text-xs font-mono font-bold ${accent}">${sign}${formatARS(g.total)} <span class="text-zinc-500 font-normal">(${pct}%)</span></span>
+                                <span class="font-mono text-zinc-200">${formatARS(entry.total)} <span class="text-zinc-500">(${pct}%)</span></span>
                             </div>
                             <div class="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full" style="width:${pct}%; background-color:${g.category.color}"></div>
+                                <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${entry.cat.color}"></div>
                             </div>
-                            <div class="space-y-0.5 pt-1">${itemsList}</div>
                         </div>
                     `;
                 }).join('');
-
-                return `
-                    <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-3">
-                        <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
-                            <span class="text-xs font-bold uppercase tracking-wider ${accent}">${title}</span>
-                            <span class="text-sm font-mono font-bold ${accent}">${sign}${formatARS(total)}</span>
-                        </div>
-                        <div class="space-y-2.5 max-h-80 overflow-y-auto pr-1">${groupsHtml}</div>
-                    </div>
-                `;
-            };
-
-            contentEl.className = breakdownTab === 'both'
-                ? 'grid grid-cols-1 lg:grid-cols-2 gap-4'
-                : 'grid grid-cols-1 gap-4';
-
-            let html = '';
-            if (breakdownTab === 'both' || breakdownTab === 'income') {
-                html += renderGroupColumn('Desglose de Ingresos', incomeGroups, totalInc, true);
             }
-            if (breakdownTab === 'both' || breakdownTab === 'expense') {
-                html += renderGroupColumn('Desglose de Egresos & Vencimientos', expenseGroups, totalExp, false);
-            }
-            contentEl.innerHTML = html;
+            lucide.createIcons();
         }
 
         function updateTransactionAmountInline(txId, rawValue) {
+            const parsed = Math.max(0, parseFloat(rawValue) || 0);
             const tx = state.transactions.find(t => t.id === txId);
             if (!tx) return;
-            const parsed = Math.max(0, parseFloat(rawValue) || 0);
             tx.amount = parsed;
             saveState();
             renderAll();
-            showToast(`Monto actualizado: ${tx.title} → ${formatARS(parsed)}`, 'success');
+            showToast('Monto actualizado y totales recalculados', 'success');
         }
 
-        function overrideAutoCardEstimate(cardId, sourceMonthKey, dueDate, title, rawValue) {
+        function overrideAutoCardEstimate(cardId, sourceMonthKey, dateStr, title, rawValue) {
             const parsed = Math.max(0, parseFloat(rawValue) || 0);
-            // Fijamos el disponible del mes anterior igual a su límite para que deje de proyectar en automático ese ítem
-            if (state.cardsHistoryByMonth && Array.isArray(state.cardsHistoryByMonth[sourceMonthKey])) {
-                const prevCard = state.cardsHistoryByMonth[sourceMonthKey].find(c => c.id === cardId);
-                if (prevCard) prevCard.available = Number(prevCard.limit) || 0;
-            }
-            if (getCurrentMonthPrefix() === sourceMonthKey) {
-                const curCard = state.cards.find(c => c.id === cardId);
-                if (curCard) curCard.available = Number(curCard.limit) || 0;
-            }
-            // Si el nuevo monto es mayor a 0, lo guardamos como movimiento editable del mes
-            if (parsed > 0) {
-                state.transactions.push({
-                    id: 'tx_card_manual_' + Date.now(),
-                    date: dueDate,
-                    type: 'expense',
-                    title: title.replace(/\s*\(Consumo.*\)$/, ''),
-                    amount: parsed,
-                    category: 'cat_tarjetas',
-                    status: 'pending',
-                    notes: 'Ajustado manualmente en desglose'
-                });
-            }
+            if (!state.overriddenCardBills) state.overriddenCardBills = {};
+            state.overriddenCardBills[`${sourceMonthKey}_${cardId}`] = parsed;
             saveState();
             renderAll();
-            showToast(parsed > 0 ? `Vencimiento tarjeta actualizado a ${formatARS(parsed)}` : 'Estimación quitada del mes', 'success');
+            showToast(parsed > 0 ? 'Vencimiento de tarjeta ajustado manualmente' : 'Vencimiento quitado del mes', 'success');
         }
 
         function deleteTxFromBreakdown(txId) {
@@ -1623,86 +1491,114 @@
             showToast('Movimiento eliminado y totales recalculados', 'info');
         }
 
+        function updateCocoPaymentFromBreakdown(monthKey, rawArsValue) {
+            const parsedArs = Math.max(0, parseFloat(rawArsValue) || 0);
+            const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
+            state.cocoGoal.paymentsByMonth[monthKey] = Math.round((parsedArs / usdRate) * 100) / 100;
+            syncCocoGoalTotalPaid();
+            saveState();
+            renderAll();
+            showToast(parsedArs > 0 ? 'Devolución a Cocó y saldo del mes actualizados' : 'Devolución a Cocó quitada del mes', 'success');
+        }
+
+        // =====================================================================
+        // RENDER: LIQUIDITY, 4 CARDS & COCÓ GOAL
+        // =====================================================================
         function renderLiquidityAndCards() {
             const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+
+            // Cuenta Bancaria
             const bank = state.liquidity.bank;
-            const bankPct = bank.reference > 0 ? Math.min(100, Math.max(0, (bank.amount / bank.reference) * 100)) : 0;
             document.getElementById('bankNameLabel').textContent = bank.name;
             document.getElementById('bankAmountLabel').textContent = formatARS(bank.amount);
-            document.getElementById('bankRefLabel').textContent = `Ref: ${formatARS(bank.reference)}`;
+            document.getElementById('bankRefLabel').textContent = `Ref: ${formatARS(bank.refMax)}`;
+            const bankPct = bank.refMax > 0 ? Math.min(100, Math.max(0, (bank.amount / bank.refMax) * 100)) : 0;
             document.getElementById('bankProgressBar').style.width = `${bankPct}%`;
 
+            // Saldo en USDT + Conversión en Pesos
             const usdt = state.liquidity.usdt;
-            const usdtVal = Number(usdt.amount) || 0;
-            const usdtArsVal = usdtVal * usdRate;
-            const usdtPct = usdt.reference > 0 ? Math.min(100, Math.max(0, (usdtVal / usdt.reference) * 100)) : 0;
+            const usdtInArs = (Number(usdt.amount) || 0) * usdRate;
             document.getElementById('usdtNameLabel').textContent = usdt.name;
             document.getElementById('usdtSubRateLabel').textContent = `Manual · Cotiz. ${formatARS(usdRate)}`;
-            document.getElementById('usdtArsAmountLabel').textContent = formatARS(usdtArsVal);
-            document.getElementById('usdtAmountLabel').textContent = `${usdtVal.toLocaleString('es-AR')} USDT`;
-            document.getElementById('usdtRefLabel').textContent = `Ref: ${Number(usdt.reference).toLocaleString('es-AR')} USDT (${formatARS(Number(usdt.reference) * usdRate)})`;
+            document.getElementById('usdtArsAmountLabel').textContent = formatARS(usdtInArs);
+            document.getElementById('usdtAmountLabel').textContent = `${(Number(usdt.amount) || 0).toLocaleString('es-AR')} USDT`;
+            document.getElementById('usdtRefLabel').textContent = `Ref: ${(Number(usdt.refMax) || 2500).toLocaleString('es-AR')} USDT`;
+            const usdtPct = usdt.refMax > 0 ? Math.min(100, Math.max(0, (usdt.amount / usdt.refMax) * 100)) : 0;
             document.getElementById('usdtProgressBar').style.width = `${usdtPct}%`;
 
-            const totalAvail = state.cards.reduce((acc, c) => acc + (Number(c.available) || 0), 0);
-            document.getElementById('totalCardsAvailableLabel').textContent = `Total Disponible: ${formatARS(totalAvail)}`;
+            // 4 Tarjetas del mes activo
+            const cards = getCardsForMonth(state.currentYear, state.currentMonth);
+            const grid = document.getElementById('cardsBarsGrid');
+            let totalAvail = 0;
+            let totalNextMonthBill = 0;
+            const activeEstimates = [];
 
-            const nextInfo = getNextMonthInfo(state.currentYear, state.currentMonth);
-            const fourthBiz = getNthBusinessDay(nextInfo.year, nextInfo.month, 4);
-            document.getElementById('nextMonthCardsLabel').textContent = nextInfo.label;
-            document.getElementById('nextMonthFourthBizDayBadge').textContent = `Vto: ${String(fourthBiz.day).padStart(2, '0')}/${String(nextInfo.month + 1).padStart(2, '0')} (4to día hábil)`;
-
-            const cardsContainer = document.getElementById('cardsBarsGrid');
-            cardsContainer.innerHTML = state.cards.map(card => {
-                const m = getCardConsumptionMetrics(card);
-                const pct = m.limit > 0 ? Math.min(100, Math.max(0, (m.available / m.limit) * 100)) : 0;
-                const barColor = pct < 25 ? 'from-rose-600 to-rose-400' : pct < 55 ? 'from-amber-500 to-yellow-400' : 'from-violet-600 to-indigo-400';
-
-                const nextBillBadge = m.estimatedNextMonth > 0
-                    ? `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">Próx. mes: ${formatARS(m.estimatedNextMonth)}</span>`
-                    : `<span class="text-[10px] font-mono text-zinc-500">Sin consumo</span>`;
+            grid.innerHTML = cards.map(card => {
+                const calc = computeCardEstimate(card);
+                totalAvail += calc.available;
+                totalNextMonthBill += calc.nextBill;
+                if (calc.nextBill > 0) {
+                    activeEstimates.push(`${card.name}: ${formatARS(calc.nextBill)}`);
+                }
+                const pct = calc.limit > 0 ? Math.min(100, Math.max(0, (calc.available / calc.limit) * 100)) : 0;
 
                 return `
                     <div onclick="openManualBarModal('card', '${card.id}')" class="group cursor-pointer bg-zinc-950/90 hover:bg-zinc-950 border border-zinc-800 hover:border-violet-500/50 rounded-xl p-3.5 transition-all space-y-2">
-                        <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center justify-between">
                             <span class="text-xs font-semibold text-zinc-200 group-hover:text-white truncate">${card.name}</span>
-                            ${nextBillBadge}
+                            <span class="text-[10px] font-mono text-zinc-500 group-hover:text-violet-400 flex items-center gap-1">
+                                <span>+${calc.taxRate}% tax</span>
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
+                            </span>
                         </div>
                         <div class="flex items-baseline justify-between gap-2">
-                            <span class="text-sm font-bold font-mono tabular-nums text-white">${formatARS(m.available)}</span>
-                            <span class="text-[11px] font-mono text-zinc-500">Lím: ${formatARS(m.limit)}</span>
+                            <span class="text-base font-bold font-mono tabular-nums text-violet-300">${formatARS(calc.available)}</span>
+                            <span class="text-[10px] font-mono text-zinc-500">Lím: ${formatARS(calc.limit)}</span>
                         </div>
                         <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800/80">
-                            <div class="h-full bg-gradient-to-r ${barColor} rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                            <div class="h-full bg-gradient-to-r from-violet-600 to-indigo-400 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                         </div>
-                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
-                            <span>Utilizado: ${formatARS(m.used)}</span>
-                            <span>Taxes: +${m.taxRate}%</span>
+                        <div class="flex items-center justify-between text-[10px] pt-0.5">
+                            <span class="text-zinc-500">Utilizado: <strong class="font-mono text-zinc-300">${formatARS(calc.used)}</strong></span>
+                            <span class="text-indigo-300 font-mono">Próx. mes: <strong>${formatARS(calc.nextBill)}</strong></span>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            const totalEstimatedNextMonth = getTotalCardsEstimatedNextMonth();
-            document.getElementById('nextMonthCardsTotal').textContent = formatARS(totalEstimatedNextMonth);
+            document.getElementById('totalCardsAvailableLabel').textContent = `Total Disponible: ${formatARS(totalAvail)}`;
 
-            const activeCards = state.cards
-                .map(c => ({ name: c.name, m: getCardConsumptionMetrics(c) }))
-                .filter(x => x.m.estimatedNextMonth > 0);
+            // Banner Mes Siguiente + 4to día hábil
+            const nextYM = getNextYearMonth(state.currentYear, state.currentMonth);
+            const nextMonthName = new Date(nextYM.year, nextYM.month, 1).toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+            const fourthBiz = getFourthBusinessDayOfMonth(nextYM.year, nextYM.month);
 
-            document.getElementById('nextMonthCardsBreakdownText').textContent = activeCards.length > 0
-                ? activeCards.map(x => `${x.name}: ${formatARS(x.m.used)} + ${x.m.taxRate}% = ${formatARS(x.m.estimatedNextMonth)}`).join(' · ')
-                : 'Bajá el disponible de una tarjeta para proyectar Utilizado + Taxes al 4to día hábil.';
+            document.getElementById('nextMonthCardsLabel').textContent = nextMonthName;
+            document.getElementById('nextMonthFourthBizDayBadge').textContent = `Vto: ${String(fourthBiz.day).padStart(2, '0')}/${String(nextYM.month + 1).padStart(2, '0')} (4to día hábil)`;
+            document.getElementById('nextMonthCardsTotal').textContent = formatARS(totalNextMonthBill);
+            document.getElementById('nextMonthCardsBreakdownText').textContent = activeEstimates.length > 0
+                ? activeEstimates.join(' · ')
+                : 'Sin consumo cargado aún en las tarjetas este mes.';
+        }
+
+        function setGlobalCardTax(rate) {
+            const cards = getCardsForMonth(state.currentYear, state.currentMonth);
+            cards.forEach(c => c.taxRate = rate);
+            saveState();
+            renderAll();
+            showToast(`Taxes estimados de tarjetas ajustados a ${rate}%`, 'info');
         }
 
         function renderCocoGoal() {
+            const coco = state.cocoGoal;
             const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
-            const g = state.cocoGoal;
-            const target = Math.max(1, Number(g.target) || 2500);
-            const paid = Math.max(0, Number(g.paid) || 0);
+            const paid = Math.max(0, Number(coco.paid) || 0);
+            const target = Math.max(1, Number(coco.target) || 2500);
             const remaining = Math.max(0, target - paid);
             const pct = Math.min(100, Math.round((paid / target) * 100));
 
-            document.getElementById('cocoGoalTitle').textContent = g.title;
+            document.getElementById('cocoGoalTitle').textContent = coco.title || 'Devolución a Cocó';
             document.getElementById('cocoPaidLabel').textContent = formatUSD(paid);
             document.getElementById('cocoPaidArsLabel').textContent = `≈ ${formatARS(paid * usdRate)} ARS`;
             document.getElementById('cocoTargetLabel').textContent = formatUSD(target);
@@ -1713,206 +1609,249 @@
             document.getElementById('cocoRemainingArsLabel').textContent = `≈ ${formatARS(remaining * usdRate)} ARS`;
         }
 
+        function adjustCocoPaid(delta) {
+            const monthKey = getCurrentMonthPrefix();
+            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
+            const currentMonthUsd = Math.max(0, Number(state.cocoGoal.paymentsByMonth[monthKey]) || 0);
+            const actualAppliedDelta = delta < 0 ? -Math.min(currentMonthUsd, Math.abs(delta)) : delta;
+
+            if (actualAppliedDelta === 0 && delta < 0) {
+                state.cocoGoal.paid = Math.max(0, (Number(state.cocoGoal.paid) || 0) + delta);
+            } else {
+                state.cocoGoal.paymentsByMonth[monthKey] = Math.max(0, currentMonthUsd + actualAppliedDelta);
+                syncCocoGoalTotalPaid();
+            }
+
+            saveState();
+            renderAll();
+            showToast(`Devolución a Cocó: ${formatUSD(state.cocoGoal.paid)} (restado del saldo del mes)`, 'success');
+        }
+
+        // =====================================================================
+        // RENDER: HOJA DE RUTA (PRÉSTAMOS POR CUOTA + TARJETAS + COCÓ)
+        // =====================================================================
+        function getLoanSnapshotForMonthOffset(loan, monthOffset) {
+            const currentInst = (Number(loan.decInstallment) || 1) + monthOffset;
+            const totalInst = Math.max(1, Number(loan.totalInstallments) || 12);
+            const instAmt = Math.max(0, Number(loan.installmentAmount) || 0);
+            if (currentInst > totalInst) {
+                return { active: false, installmentNumber: totalInst, totalInstallments: totalInst, remainingBalance: 0 };
+            }
+            const remainingInstallmentsAfterMonth = Math.max(0, totalInst - currentInst);
+            const remainingBalance = remainingInstallmentsAfterMonth * instAmt;
+            return {
+                active: true,
+                installmentNumber: currentInst,
+                totalInstallments: totalInst,
+                installmentAmount: instAmt,
+                remainingBalance
+            };
+        }
+
         function renderRoadmapTable() {
-            const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
-            const liveGrid = document.getElementById('loansLiveSummaryGrid');
-            if (liveGrid) {
-                liveGrid.innerHTML = state.loans.map(loan => {
-                    const snap = getLoanSnapshotForMonth(loan, 0);
+            const summaryGrid = document.getElementById('loansLiveSummaryGrid');
+            const tbody = document.getElementById('roadmapTableBody');
+
+            // Resumen vivo de préstamos
+            if (state.loans.length === 0) {
+                summaryGrid.innerHTML = `<div class="col-span-full text-xs text-zinc-500 italic bg-zinc-950/70 border border-zinc-800 rounded-xl p-3">Sin préstamos activos en la hoja de ruta.</div>`;
+            } else {
+                summaryGrid.innerHTML = state.loans.map(loan => {
+                    const decSnap = getLoanSnapshotForMonthOffset(loan, 0);
                     return `
-                        <div class="bg-zinc-950/90 border border-zinc-800 rounded-xl p-3 flex items-center justify-between gap-2">
+                        <div class="bg-zinc-950/90 border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between gap-2">
                             <div>
-                                <span class="text-xs font-semibold text-white block">${loan.name}</span>
-                                <span class="text-[11px] font-mono text-zinc-400">Dic 26: Cuota ${snap.paidCount}/${snap.total} (${formatARS(snap.installmentAmount)})</span>
+                                <div class="text-xs font-bold text-white">${loan.name}</div>
+                                <div class="text-[11px] text-zinc-400 mt-0.5">
+                                    Dic 26: <span class="text-indigo-300 font-mono">Cuota ${decSnap.installmentNumber}/${decSnap.totalInstallments}</span> · ${formatARS(loan.installmentAmount)}/mes
+                                </div>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs font-bold font-mono text-rose-400 block">${formatARS(snap.remainingBalance)}</span>
-                                <span class="text-[10px] text-zinc-500">Restan ${snap.remainingInstallments} ctas</span>
+                                <span class="text-[10px] text-zinc-500 block">Saldo tras Dic</span>
+                                <span class="text-xs font-bold font-mono text-rose-400">${formatARS(decSnap.remainingBalance)}</span>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            const currentCardsUsed = getTotalCardsUsedFromBars();
-            const currentCardsEst = getTotalCardsEstimatedNextMonth();
-            const tbody = document.getElementById('roadmapTableBody');
-            if (!tbody) return;
-
-            tbody.innerHTML = state.roadmapPlan.map((row, idx) => {
-                const offset = row.monthOffset !== undefined ? row.monthOffset : idx;
-                let loansTotalRemaining = 0;
-                const loansBreakdownHtml = state.loans.map(loan => {
-                    const snap = getLoanSnapshotForMonth(loan, offset);
-                    loansTotalRemaining += snap.remainingBalance;
-                    return `<div class="text-[10px] text-zinc-400">${loan.name}: <span class="text-zinc-300">cta ${snap.paidCount}/${snap.total}</span> · ${formatARS(snap.remainingBalance)}</div>`;
+            tbody.innerHTML = state.roadmapExtras.map((row, idx) => {
+                let totalLoansRemaining = 0;
+                const loanBadges = state.loans.map(loan => {
+                    const snap = getLoanSnapshotForMonthOffset(loan, row.monthIndex);
+                    totalLoansRemaining += snap.remainingBalance;
+                    return snap.active
+                        ? `<div class="text-[11px] text-zinc-300">${loan.name}: <span class="text-indigo-300">cta ${snap.installmentNumber}/${snap.totalInstallments}</span> (${formatARS(snap.remainingBalance)})</div>`
+                        : `<div class="text-[11px] text-emerald-400">${loan.name}: Cancelado ($ 0)</div>`;
                 }).join('');
 
-                // En Dic 2026 mostramos las tarjetas de Dic ($2.143.077) + utilizado actual; en Ene 2027 el estimado con taxes
-                const dicScheduledCards = state.transactions
-                    .filter(t => t.date.startsWith('2026-12') && t.category === 'cat_tarjetas')
-                    .reduce((s, t) => s + (Number(t.amount) || 0), 0);
-                const cardsDebtForRow = offset === 0 ? (dicScheduledCards + currentCardsUsed) : offset === 1 ? currentCardsEst : 0;
-                const totalConsolidated = loansTotalRemaining + cardsDebtForRow + (Number(row.cocoDebt) || 0);
-                const cocoUsdEq = usdRate > 0 ? Math.round((Number(row.cocoDebt) || 0) / usdRate) : 0;
+                // Tarjetas mes a mes calculadas desde el historial de las 4 barritas o los vencimientos del mes
+                const monthCards = getCardsForMonth(row.year, row.month);
+                const cardsUsedPlusTax = monthCards.reduce((sum, c) => sum + computeCardEstimate(c).nextBill, 0);
+                const rowCardsDebt = row.monthIndex === 0
+                    ? getAllMonthExpensesIncludingCards(2026, 11).filter(t => t.category === 'cat_tarjetas').reduce((s, t) => s + (Number(t.amount) || 0), 0)
+                    : cardsUsedPlusTax;
+
+                const cocoDebt = Math.max(0, Number(row.cocoDebt) || 0);
+                const totalConsolidatedDebt = totalLoansRemaining + rowCardsDebt + cocoDebt;
 
                 return `
-                    <tr onclick="openRoadmapRowModal(${idx})" class="hover:bg-zinc-800/40 cursor-pointer transition-colors align-top">
-                        <td class="py-2.5 px-3 font-sans font-semibold text-zinc-200">${row.label}</td>
-                        <td class="py-2.5 px-3 text-right">
-                            <div class="font-bold text-rose-400">${formatARS(loansTotalRemaining)}</div>
-                            <div class="mt-0.5 space-y-0.5">${loansBreakdownHtml}</div>
+                    <tr onclick="openRoadmapRowModal(${idx})" class="cursor-pointer hover:bg-zinc-800/50 transition-colors">
+                        <td class="py-3 px-3 font-sans font-semibold text-white">${row.label}</td>
+                        <td class="py-3 px-3 text-right">
+                            <div class="font-bold text-rose-400">${formatARS(totalLoansRemaining)}</div>
+                            ${loanBadges}
                         </td>
-                        <td class="py-2.5 px-3 text-right text-violet-300">
-                            ${formatARS(cardsDebtForRow)}
-                            <span class="block text-[10px] text-zinc-500">${offset === 0 ? 'Vtos. Dic + Uso' : offset === 1 ? 'Est. +Taxes' : 'Según barritas'}</span>
-                        </td>
-                        <td class="py-2.5 px-3 text-right text-pink-300">
-                            ${formatARS(row.cocoDebt)}
-                            <span class="block text-[10px] text-zinc-500">≈ USD ${cocoUsdEq.toLocaleString('es-AR')}</span>
-                        </td>
-                        <td class="py-2.5 px-3 text-right font-bold text-white">${formatARS(totalConsolidated)}</td>
-                        <td class="py-2.5 px-3 text-right font-semibold text-emerald-400">${formatARS(row.netSaved)}</td>
+                        <td class="py-3 px-3 text-right text-violet-300">${formatARS(rowCardsDebt)}</td>
+                        <td class="py-3 px-3 text-right text-pink-300">${formatARS(cocoDebt)}</td>
+                        <td class="py-3 px-3 text-right font-bold text-amber-300">${formatARS(totalConsolidatedDebt)}</td>
+                        <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatARS(row.netSaved)}</td>
                     </tr>
                 `;
             }).join('');
         }
 
+        // =====================================================================
+        // RENDER: CALENDAR GRID & MOVEMENTS LIST
+        // =====================================================================
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
+            const bridgeNote = document.getElementById('calendarBridgeNote');
             const year = state.currentYear;
             const month = state.currentMonth;
-            const firstDay = new Date(year, month, 1);
+
+            const isDec2026Bridge = (year === 2026 && month === 11);
+            bridgeNote.textContent = isDec2026Bridge
+                ? 'Incluye la última semana de Noviembre (Regalo Lela + OWA) conectada con Diciembre 2026. Clic en cualquier día para editar.'
+                : 'Clic en cualquier día para agregar o editar ingresos, egresos o vencimientos.';
+
+            const firstDayOfMonth = new Date(year, month, 1);
             const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Lunes = 0 ... Domingo = 6
+            const startWeekday = (firstDayOfMonth.getDay() + 6) % 7;
 
-            let startWeekday = firstDay.getDay() - 1;
-            if (startWeekday < 0) startWeekday = 6;
+            const prevYM = getPrevYearMonth(year, month);
+            const daysInPrevMonth = new Date(prevYM.year, prevYM.month + 1, 0).getDate();
 
-            const monthTxs = getMonthTransactions();
-            const projectedCards = getProjectedCardItemsForMonth(year, month);
-            const bridgeNoteEl = document.getElementById('calendarBridgeNote');
-
-            let cellsHtml = '';
-
-            // En Diciembre 2026 mostramos en la primera fila los días finales de Noviembre (23-30 Nov) con sus ingresos (OWA / Regalo Lela)
-            if (year === 2026 && month === 11) {
-                if (bridgeNoteEl) {
-                    bridgeNoteEl.textContent = 'Incluye cierre de Noviembre (23–30 Nov: OWA / Regalo Lela) + clic en cualquier día para sumar movimientos.';
-                }
-                // 1 Dic 2026 es Martes (startWeekday = 1). Mostramos la semana previa completa (Lun 23 Nov al Lun 30 Nov)
-                const novDays = [23, 24, 25, 26, 27, 28, 29, 30];
-                novDays.forEach(nDay => {
-                    const dateStr = `2026-11-${String(nDay).padStart(2, '0')}`;
-                    const dayTxs = monthTxs.filter(t => t.date === dateStr);
-                    const pills = dayTxs.map(tx => {
-                        const isInc = tx.type === 'income';
-                        const badgeClass = isInc
-                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
-                        const sign = isInc ? '+' : '-';
-                        return `<div class="text-[10px] font-mono truncate px-1.5 py-0.5 rounded border ${badgeClass}" title="${tx.title}: ${sign}${formatARS(tx.amount)}">${sign}${formatARS(tx.amount)}</div>`;
-                    }).join('');
-
-                    cellsHtml += `
-                        <div onclick="openDayModal('${dateStr}')" class="calendar-day-cell group cursor-pointer rounded-xl bg-zinc-950/45 hover:bg-zinc-900 border border-dashed border-zinc-800/80 hover:border-teal-500/50 p-1.5 sm:p-2 flex flex-col justify-between transition-all">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-mono font-semibold text-zinc-500 group-hover:text-teal-300">${nDay} <span class="text-[9px] uppercase">Nov</span></span>
-                            </div>
-                            <div class="space-y-1 mt-1">${pills}</div>
-                        </div>
-                    `;
-                });
-            } else {
-                if (bridgeNoteEl) {
-                    bridgeNoteEl.textContent = 'Clic en cualquier día para agregar ingresos o egresos propios del mes.';
-                }
-                for (let i = 0; i < startWeekday; i++) {
-                    cellsHtml += `<div class="calendar-day-cell rounded-xl bg-zinc-950/30 border border-zinc-900/60"></div>`;
-                }
-            }
-
+            const allMonthItems = getAllMonthExpensesIncludingCards(year, month);
             const todayStr = new Date().toISOString().split('T')[0];
 
+            const cells = [];
+
+            // Días previos (puente de Noviembre visible si estamos en Dic 2026, o relleno suave)
+            for (let i = startWeekday - 1; i >= 0; i--) {
+                const prevDay = daysInPrevMonth - i;
+                const dateStr = `${prevYM.year}-${String(prevYM.month + 1).padStart(2, '0')}-${String(prevDay).padStart(2, '0')}`;
+                const dayItems = isDec2026Bridge ? allMonthItems.filter(t => t.date === dateStr) : [];
+                cells.push({
+                    dateStr,
+                    dayNumber: prevDay,
+                    isCurrentMonth: false,
+                    isBridgeNov: isDec2026Bridge,
+                    items: dayItems
+                });
+            }
+
+            // Días del mes actual
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayPadded = String(day).padStart(2, '0');
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${dayPadded}`;
-                const dayTxs = monthTxs.filter(t => t.date === dateStr);
-                const dayCardEstimates = projectedCards.filter(p => p.date === dateStr);
-                const isToday = dateStr === todayStr;
-                const isHoliday = AR_HOLIDAYS.has(dateStr);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayItems = allMonthItems.filter(t => t.date === dateStr);
+                cells.push({
+                    dateStr,
+                    dayNumber: day,
+                    isCurrentMonth: true,
+                    isBridgeNov: false,
+                    items: dayItems
+                });
+            }
 
-                const pills = [
-                    ...dayTxs.map(tx => {
-                        const isInc = tx.type === 'income';
-                        const badgeClass = isInc
-                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                            : tx.status === 'pending'
-                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                                : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
-                        const sign = isInc ? '+' : '-';
-                        return `<div class="text-[10px] font-mono truncate px-1.5 py-0.5 rounded border ${badgeClass}" title="${tx.title}: ${sign}${formatARS(tx.amount)}">${sign}${formatARS(tx.amount)}</div>`;
-                    }),
-                    ...dayCardEstimates.map(est => {
-                        return `<div class="text-[10px] font-mono truncate px-1.5 py-0.5 rounded border bg-indigo-500/15 text-indigo-300 border-indigo-500/30" title="${est.title}: -${formatARS(est.amount)}">-${formatARS(est.amount)}</div>`;
-                    })
-                ].slice(0, 3).join('');
+            // Completar fila final hasta múltiplo de 7
+            const nextYM = getNextYearMonth(year, month);
+            let nextDayCounter = 1;
+            while (cells.length % 7 !== 0) {
+                const dateStr = `${nextYM.year}-${String(nextYM.month + 1).padStart(2, '0')}-${String(nextDayCounter).padStart(2, '0')}`;
+                cells.push({
+                    dateStr,
+                    dayNumber: nextDayCounter,
+                    isCurrentMonth: false,
+                    isBridgeNov: false,
+                    items: []
+                });
+                nextDayCounter++;
+            }
 
-                const totalItems = dayTxs.length + dayCardEstimates.length;
-                const extraCount = totalItems > 3 ? `<div class="text-[10px] text-zinc-500 pl-1">+${totalItems - 3} más</div>` : '';
+            grid.innerHTML = cells.map(cell => {
+                const isToday = cell.dateStr === todayStr;
+                const activeCell = cell.isCurrentMonth || cell.isBridgeNov;
+                const bgClass = activeCell
+                    ? (cell.isBridgeNov ? 'bg-zinc-900/60 hover:bg-zinc-800/80 border-zinc-800/80' : 'bg-zinc-950/90 hover:bg-zinc-900 border-zinc-800/90')
+                    : 'bg-zinc-950/30 border-zinc-900/60 opacity-40';
 
-                cellsHtml += `
-                    <div onclick="openDayModal('${dateStr}')" class="calendar-day-cell group cursor-pointer rounded-xl bg-zinc-950/80 hover:bg-zinc-900 border ${isToday ? 'border-indigo-500/70' : 'border-zinc-800/80 hover:border-zinc-700'} p-1.5 sm:p-2 flex flex-col justify-between transition-all">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-mono font-semibold ${isToday ? 'text-indigo-400' : isHoliday ? 'text-rose-400' : 'text-zinc-400 group-hover:text-white'}">${day}</span>
-                            ${isHoliday ? '<span class="text-[9px] text-rose-400/80 uppercase">Fer.</span>' : ''}
+                const badgesHtml = cell.items.slice(0, 3).map(item => {
+                    let pillClass = 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+                    if (item.type === 'income') {
+                        pillClass = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+                    } else if (item.isAutoCardEstimate) {
+                        pillClass = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+                    } else if (item.isAutoCocoPayment) {
+                        pillClass = 'bg-pink-500/20 text-pink-300 border-pink-500/30';
+                    } else if (item.status === 'pending') {
+                        pillClass = 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+                    }
+
+                    return `
+                        <div class="px-1.5 py-0.5 rounded border text-[10px] font-medium truncate ${pillClass}" title="${item.title}: ${formatARS(item.amount)}">
+                            ${item.type === 'income' ? '+' : '-'}${Math.round((Number(item.amount) || 0) / 1000)}k ${item.title}
                         </div>
-                        <div class="space-y-1 mt-1">
-                            ${pills}
-                            ${extraCount}
+                    `;
+                }).join('');
+
+                const moreHtml = cell.items.length > 3
+                    ? `<div class="text-[9px] text-zinc-400 font-mono pl-1">+${cell.items.length - 3} más</div>`
+                    : '';
+
+                return `
+                    <div onclick="openDayModal('${cell.dateStr}')" class="calendar-day-cell cursor-pointer rounded-xl border p-1.5 sm:p-2 flex flex-col justify-between transition-all ${bgClass} ${isToday ? 'ring-1 ring-indigo-500' : ''}">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-semibold ${activeCell ? 'text-zinc-300' : 'text-zinc-600'}">
+                                ${cell.isBridgeNov ? `${cell.dayNumber} Nov` : cell.dayNumber}
+                            </span>
+                            ${cell.items.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>` : ''}
+                        </div>
+                        <div class="space-y-1 overflow-hidden">
+                            ${badgesHtml}
+                            ${moreHtml}
                         </div>
                     </div>
                 `;
-            }
-
-            grid.innerHTML = cellsHtml;
+            }).join('');
         }
 
         function renderMonthMovementsList() {
             const container = document.getElementById('monthMovementsList');
-            const monthTxs = getMonthTransactions();
-            const projectedCards = getProjectedCardItemsForMonth(state.currentYear, state.currentMonth);
+            let items = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth)
+                .slice()
+                .sort((a, b) => a.date.localeCompare(b.date));
 
-            document.querySelectorAll('.filter-chip').forEach(btn => {
-                const active = btn.dataset.filter === listFilter;
-                btn.className = active
-                    ? 'filter-chip px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium'
-                    : 'filter-chip px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white';
-            });
+            if (state.filter === 'pending') {
+                items = items.filter(i => i.status === 'pending');
+            } else if (state.filter === 'income') {
+                items = items.filter(i => i.type === 'income');
+            } else if (state.filter === 'expense') {
+                items = items.filter(i => i.type === 'expense');
+            }
 
-            let combined = [
-                ...monthTxs.map(t => ({ ...t, isEstimate: false })),
-                ...projectedCards.map(p => ({ ...p, isEstimate: true }))
-            ];
-
-            if (listFilter === 'pending') combined = combined.filter(i => i.status === 'pending');
-            else if (listFilter === 'income') combined = combined.filter(i => i.type === 'income');
-            else if (listFilter === 'expense') combined = combined.filter(i => i.type === 'expense');
-
-            combined.sort((a, b) => a.date.localeCompare(b.date));
-
-            if (combined.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-6">No hay movimientos para este filtro.</p>`;
+            if (items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-zinc-500 italic py-6 text-center">No hay movimientos para este filtro.</p>`;
                 return;
             }
 
-            container.innerHTML = combined.map(item => {
-                const [iYear, iMonth, dayNum] = item.date.split('-');
-                const isPrevBridge = (state.currentYear === 2026 && state.currentMonth === 11 && iMonth === '11');
-                const dayBadgeText = isPrevBridge ? `${dayNum}/11` : `Día ${dayNum}`;
-                const isInc = item.type === 'income';
+            container.innerHTML = items.map(item => {
                 const cat = getCategoryById(item.category);
+                const parts = item.date.split('-');
+                const dayBadgeText = `${parts[2]}/${parts[1]}`;
 
-                if (item.isEstimate) {
+                if (item.isAutoCardEstimate) {
                     return `
                         <div class="p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 flex items-center justify-between gap-2">
                             <div class="min-w-0">
@@ -1927,27 +1866,45 @@
                     `;
                 }
 
+                if (item.isAutoCocoPayment) {
+                    return `
+                        <div onclick="openCocoModal()" class="cursor-pointer p-2.5 rounded-xl bg-pink-950/25 hover:bg-pink-950/40 border border-pink-500/30 flex items-center justify-between gap-2 transition-colors">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
+                                    <span class="text-[10px] font-mono text-pink-300">${dayBadgeText}</span>
+                                    <span class="text-xs font-semibold text-pink-200 truncate">${item.title}</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+                                    <span class="text-emerald-400">Efectivizado · Restado del saldo del mes</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatARS(item.amount)}</span>
+                        </div>
+                    `;
+                }
+
+                const isCompleted = item.status === 'completed';
                 return `
-                    <div onclick="openDayModal('${item.date}')" class="cursor-pointer p-2.5 rounded-xl bg-zinc-950/90 hover:bg-zinc-950 border border-zinc-800/90 flex items-center justify-between gap-2 transition-colors">
-                        <div class="min-w-0">
+                    <div class="p-2.5 rounded-xl bg-zinc-950/90 hover:bg-zinc-950 border border-zinc-800/90 flex items-center justify-between gap-2 transition-colors">
+                        <div onclick="openDayModal('${item.date}')" class="cursor-pointer min-w-0 flex-1">
                             <div class="flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
                                 <span class="text-[10px] font-mono text-zinc-500">${dayBadgeText}</span>
                                 <span class="text-xs font-semibold text-zinc-200 truncate">${item.title}</span>
                             </div>
-                            <div class="flex items-center gap-2 mt-0.5 text-[10px]">
-                                <span class="${item.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}">
-                                    ${item.status === 'completed' ? 'Efectivizado' : 'Pendiente'}
-                                </span>
-                                ${item.notes ? `<span class="text-zinc-500 truncate">· ${item.notes}</span>` : ''}
+                            <div class="flex items-center gap-2 mt-0.5 text-[10px] text-zinc-500">
+                                <span>${cat.name}</span>
+                                <span>·</span>
+                                <span class="${isCompleted ? 'text-emerald-400' : 'text-amber-400'}">${isCompleted ? 'Efectivizado' : 'Pendiente'}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-xs font-bold font-mono ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${isInc ? '+' : '-'}${formatARS(item.amount)}
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="text-xs font-bold font-mono ${item.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${item.type === 'income' ? '+' : '-'}${formatARS(item.amount)}
                             </span>
-                            <button type="button" onclick="event.stopPropagation(); toggleTxStatus('${item.id}')" class="p-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white" title="Cambiar estado Pagado/Pendiente">
-                                <i data-lucide="${item.status === 'completed' ? 'check-circle-2' : 'circle'}" class="w-3.5 h-3.5 ${item.status === 'completed' ? 'text-emerald-400' : ''}"></i>
+                            <button type="button" onclick="toggleTransactionStatus('${item.id}')" class="p-1.5 rounded-lg border ${isCompleted ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-300'}" title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como cobrado/pagado'}">
+                                <i data-lucide="check" class="w-3 h-3"></i>
                             </button>
                         </div>
                     </div>
@@ -1955,35 +1912,44 @@
             }).join('');
         }
 
-        function renderChart() {
-            const ctx = document.getElementById('cashflowChart').getContext('2d');
-            const year = state.currentYear;
-            const month = state.currentMonth;
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const monthTxs = getMonthTransactions();
-            const projectedCards = getProjectedCardItemsForMonth(year, month);
+        function toggleTransactionStatus(txId) {
+            const tx = state.transactions.find(t => t.id === txId);
+            if (!tx) return;
+            tx.status = tx.status === 'completed' ? 'pending' : 'completed';
+            saveState();
+            renderAll();
+            showToast(tx.status === 'completed' ? 'Marcado como efectivizado' : 'Marcado como pendiente', 'info');
+        }
 
-            const labels = [];
-            const cumulativeData = [];
+        // =====================================================================
+        // RENDER: CASHFLOW CHART
+        // =====================================================================
+        function renderCashflowChart() {
+            const canvas = document.getElementById('cashflowChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const daysInMonth = new Date(state.currentYear, state.currentMonth + 1, 0).getDate();
+            const prefix = getCurrentMonthPrefix();
+            const allItems = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
+
+            // Saldo inicial del puente de Noviembre si estamos en Diciembre 2026
             let running = 0;
-
-            // Si estamos en Diciembre 2026, arrancamos el flujo acumulado con el puente de Noviembre (20-30 Nov)
-            if (year === 2026 && month === 11) {
-                monthTxs.filter(t => t.date.startsWith('2026-11')).forEach(t => {
-                    running += t.type === 'income' ? Number(t.amount) : -Number(t.amount);
+            if (state.currentYear === 2026 && state.currentMonth === 11) {
+                allItems.filter(t => t.date < '2026-12-01').forEach(t => {
+                    running += t.type === 'income' ? (Number(t.amount) || 0) : -(Number(t.amount) || 0);
                 });
             }
 
+            const labels = [];
+            const dataPoints = [];
             for (let d = 1; d <= daysInMonth; d++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dateStr = `${prefix}-${String(d).padStart(2, '0')}`;
+                allItems.filter(t => t.date === dateStr).forEach(t => {
+                    running += t.type === 'income' ? (Number(t.amount) || 0) : -(Number(t.amount) || 0);
+                });
                 labels.push(String(d));
-                monthTxs.filter(t => t.date === dateStr).forEach(t => {
-                    running += t.type === 'income' ? Number(t.amount) : -Number(t.amount);
-                });
-                projectedCards.filter(p => p.date === dateStr).forEach(p => {
-                    running -= Number(p.amount);
-                });
-                cumulativeData.push(running);
+                dataPoints.push(running);
             }
 
             if (cashflowChartInstance) {
@@ -1995,14 +1961,14 @@
                 data: {
                     labels,
                     datasets: [{
-                        label: 'Flujo Acumulado ($)',
-                        data: cumulativeData,
-                        borderColor: '#818cf8',
-                        backgroundColor: 'rgba(99, 102, 241, 0.14)',
+                        label: 'Saldo Proyectado ($)',
+                        data: dataPoints,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.12)',
                         borderWidth: 2,
+                        pointRadius: 1.5,
                         fill: true,
-                        tension: 0.3,
-                        pointRadius: 2
+                        tension: 0.3
                     }]
                 },
                 options: {
@@ -2018,15 +1984,15 @@
                     },
                     scales: {
                         x: {
-                            grid: { color: 'rgba(63, 63, 70, 0.25)' },
-                            ticks: { color: '#71717a', font: { size: 10 } }
+                            grid: { color: 'rgba(39, 39, 42, 0.4)' },
+                            ticks: { color: '#71717a', font: { size: 10 }, maxTicksLimit: 10 }
                         },
                         y: {
-                            grid: { color: 'rgba(63, 63, 70, 0.25)' },
+                            grid: { color: 'rgba(39, 39, 42, 0.4)' },
                             ticks: {
                                 color: '#71717a',
                                 font: { size: 10 },
-                                callback: (v) => '$' + (v / 1000) + 'k'
+                                callback: (v) => `$${Math.round(v / 1000)}k`
                             }
                         }
                     }
@@ -2034,41 +2000,55 @@
             });
         }
 
-        function renderCategorySelect() {
-            const select = document.getElementById('txCategory');
-            if (!select) return;
-            select.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        // =====================================================================
+        // MODALS: MANUAL BARS (BANK / USDT / CARDS)
+        // =====================================================================
+        function updateManualBarCardPreview() {
+            const limit = Math.max(0, parseFloat(document.getElementById('mbLimit').value) || 0);
+            const avail = Math.max(0, parseFloat(document.getElementById('mbAmount').value) || 0);
+            const taxRate = Math.max(0, parseFloat(document.getElementById('mbTaxRate').value) || 0);
+            const used = Math.max(0, limit - avail);
+            const taxes = Math.round(used * (taxRate / 100));
+            const nextBill = used + taxes;
+
+            document.getElementById('mbPreviewUsed').textContent = formatARS(used);
+            document.getElementById('mbPreviewTaxPct').textContent = taxRate;
+            document.getElementById('mbPreviewTaxes').textContent = formatARS(taxes);
+            document.getElementById('mbPreviewNextBill').textContent = formatARS(nextBill);
         }
 
-        // =========================================================================
-        // MODAL CONTROLLERS & ACTIONS
-        // =========================================================================
+        function setModalTaxRate(rate) {
+            document.getElementById('mbTaxRate').value = rate;
+            updateManualBarCardPreview();
+        }
+
         function openManualBarModal(group, id) {
             document.getElementById('mbGroup').value = group;
             document.getElementById('mbId').value = id;
+            const cardSection = document.getElementById('mbCardCalcSection');
 
-            const cardCalcSec = document.getElementById('mbCardCalcSection');
             if (group === 'liquidity') {
+                cardSection.classList.add('hidden');
                 const item = state.liquidity[id];
                 document.getElementById('manualBarModalTitle').textContent = `Editar ${item.name}`;
                 document.getElementById('mbName').value = item.name;
-                document.getElementById('mbAmountLabel').textContent = `Saldo Actual (${item.currency})`;
-                document.getElementById('mbLimitLabel').textContent = `Referencia Barra (${item.currency})`;
+                document.getElementById('mbAmountLabel').textContent = id === 'usdt' ? 'Saldo Actual (USDT)' : 'Saldo Actual ($ ARS)';
+                document.getElementById('mbLimitLabel').textContent = id === 'usdt' ? 'Referencia Barra (USDT)' : 'Referencia Barra ($ ARS)';
                 document.getElementById('mbAmount').value = item.amount;
-                document.getElementById('mbLimit').value = item.reference;
-                cardCalcSec.classList.add('hidden');
+                document.getElementById('mbLimit').value = item.refMax;
             } else {
-                const card = state.cards.find(c => c.id === id);
+                cardSection.classList.remove('hidden');
+                const cards = getCardsForMonth(state.currentYear, state.currentMonth);
+                const card = cards.find(c => c.id === id);
                 if (!card) return;
-                document.getElementById('manualBarModalTitle').textContent = `Editar ${card.name}`;
+                document.getElementById('manualBarModalTitle').textContent = `Editar Tarjeta: ${card.name}`;
                 document.getElementById('mbName').value = card.name;
                 document.getElementById('mbAmountLabel').textContent = 'Saldo Disponible Actual ($)';
                 document.getElementById('mbLimitLabel').textContent = 'Límite Total ($)';
                 document.getElementById('mbAmount').value = card.available;
                 document.getElementById('mbLimit').value = card.limit;
                 document.getElementById('mbTaxRate').value = card.taxRate ?? 7.5;
-                cardCalcSec.classList.remove('hidden');
-                updateCardModalPreview();
+                updateManualBarCardPreview();
             }
 
             document.getElementById('manualBarModal').classList.remove('hidden');
@@ -2079,41 +2059,18 @@
             document.getElementById('manualBarModal').classList.add('hidden');
         }
 
-        function setModalTaxRate(rate) {
-            document.getElementById('mbTaxRate').value = rate;
-            updateCardModalPreview();
-        }
-
-        function updateCardModalPreview() {
-            if (document.getElementById('mbGroup').value !== 'card') return;
-            const avail = Math.max(0, parseFloat(document.getElementById('mbAmount').value) || 0);
-            const limit = Math.max(0, parseFloat(document.getElementById('mbLimit').value) || 0);
-            const taxRate = Math.max(0, parseFloat(document.getElementById('mbTaxRate').value) || 0);
-
-            const m = getCardConsumptionMetrics({ available: avail, limit, taxRate });
-            document.getElementById('mbPreviewUsed').textContent = formatARS(m.used);
-            document.getElementById('mbPreviewTaxPct').textContent = taxRate;
-            document.getElementById('mbPreviewTaxes').textContent = formatARS(m.taxes);
-            document.getElementById('mbPreviewNextBill').textContent = formatARS(m.estimatedNextMonth);
-        }
-
+        // =====================================================================
+        // MODALS: COCÓ, LOANS, ROADMAP ROW, CATEGORIES, DAY
+        // =====================================================================
         function openCocoModal() {
-            document.getElementById('cocoTitleInput').value = state.cocoGoal.title;
-            document.getElementById('cocoPaidInput').value = state.cocoGoal.paid;
-            document.getElementById('cocoTargetInput').value = state.cocoGoal.target;
+            document.getElementById('cocoTitleInput').value = state.cocoGoal.title || 'Devolución a Cocó';
+            document.getElementById('cocoPaidInput').value = state.cocoGoal.paid || 0;
+            document.getElementById('cocoTargetInput').value = state.cocoGoal.target || 2500;
             document.getElementById('cocoModal').classList.remove('hidden');
-            lucide.createIcons();
         }
 
         function closeCocoModal() {
             document.getElementById('cocoModal').classList.add('hidden');
-        }
-
-        function adjustCocoPaid(delta) {
-            state.cocoGoal.paid = Math.max(0, (Number(state.cocoGoal.paid) || 0) + delta);
-            saveState();
-            renderCocoGoal();
-            showToast(`Devolución a Cocó: ${formatUSD(state.cocoGoal.paid)}`, 'success');
         }
 
         function openLoansConfigModal() {
@@ -2129,29 +2086,29 @@
         function renderLoansEditorList() {
             const container = document.getElementById('loansEditorList');
             if (state.loans.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4">No hay préstamos cargados.</p>`;
+                container.innerHTML = `<p class="text-xs text-zinc-500 italic">No hay préstamos cargados.</p>`;
                 return;
             }
             container.innerHTML = state.loans.map((loan, idx) => `
                 <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5 space-y-2.5">
                     <div class="flex items-center justify-between gap-2">
-                        <input type="text" value="${loan.name}" onchange="updateLoanField(${idx}, 'name', this.value)" class="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1 text-xs font-semibold text-white flex-1">
-                        <button type="button" onclick="deleteLoan(${idx})" class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400" title="Eliminar préstamo">
+                        <input type="text" value="${loan.name}" onchange="updateLoanField(${idx}, 'name', this.value)" class="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500">
+                        <button type="button" onclick="deleteLoan(${idx})" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950/70 text-zinc-400 hover:text-rose-400 transition-colors" title="Eliminar préstamo">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-xs">
                         <div>
                             <label class="text-[10px] text-zinc-500 block mb-0.5">Cuota en Dic 26</label>
-                            <input type="number" min="1" value="${loan.decPaidInstallment}" onchange="updateLoanField(${idx}, 'decPaidInstallment', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 font-mono text-white">
+                            <input type="number" min="1" value="${loan.decInstallment}" onchange="updateLoanField(${idx}, 'decInstallment', this.value)" class="w-full px-2 py-1 rounded bg-zinc-900 border border-zinc-800 font-mono text-white">
                         </div>
                         <div>
                             <label class="text-[10px] text-zinc-500 block mb-0.5">Total Cuotas</label>
-                            <input type="number" min="1" value="${loan.totalInstallments}" onchange="updateLoanField(${idx}, 'totalInstallments', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 font-mono text-white">
+                            <input type="number" min="1" value="${loan.totalInstallments}" onchange="updateLoanField(${idx}, 'totalInstallments', this.value)" class="w-full px-2 py-1 rounded bg-zinc-900 border border-zinc-800 font-mono text-white">
                         </div>
                         <div>
                             <label class="text-[10px] text-zinc-500 block mb-0.5">Valor Cuota ($)</label>
-                            <input type="number" min="0" value="${loan.installmentAmount}" onchange="updateLoanField(${idx}, 'installmentAmount', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 font-mono text-white">
+                            <input type="number" min="0" value="${loan.installmentAmount}" onchange="updateLoanField(${idx}, 'installmentAmount', this.value)" class="w-full px-2 py-1 rounded bg-zinc-900 border border-zinc-800 font-mono text-white">
                         </div>
                     </div>
                 </div>
@@ -2159,17 +2116,20 @@
             lucide.createIcons();
         }
 
-        function updateLoanField(idx, field, value) {
-            const loan = state.loans[idx];
+        function updateLoanField(index, field, value) {
+            const loan = state.loans[index];
             if (!loan) return;
-            if (field === 'name') loan.name = value.trim() || 'Préstamo';
-            else loan[field] = Math.max(0, Number(value) || 0);
+            if (field === 'name') {
+                loan.name = value.trim() || 'Préstamo';
+            } else {
+                loan[field] = Math.max(0, Number(value) || 0);
+            }
             saveState();
             renderRoadmapTable();
         }
 
-        function deleteLoan(idx) {
-            state.loans.splice(idx, 1);
+        function deleteLoan(index) {
+            state.loans.splice(index, 1);
             saveState();
             renderLoansEditorList();
             renderRoadmapTable();
@@ -2177,14 +2137,13 @@
         }
 
         function openRoadmapRowModal(idx) {
-            const row = state.roadmapPlan[idx];
+            const row = state.roadmapExtras[idx];
             if (!row) return;
             document.getElementById('rmRowIndex').value = idx;
-            document.getElementById('roadmapRowModalTitle').textContent = `Editar ${row.label}`;
+            document.getElementById('roadmapRowModalTitle').textContent = `Ajustar ${row.label}`;
             document.getElementById('rmCocoDebt').value = row.cocoDebt;
             document.getElementById('rmNetSaved').value = row.netSaved;
             document.getElementById('roadmapRowModal').classList.remove('hidden');
-            lucide.createIcons();
         }
 
         function closeRoadmapRowModal() {
@@ -2194,7 +2153,6 @@
         function openCategoriesModal() {
             renderCategoriesList();
             document.getElementById('categoriesModal').classList.remove('hidden');
-            lucide.createIcons();
         }
 
         function closeCategoriesModal() {
@@ -2203,26 +2161,37 @@
 
         function renderCategoriesList() {
             const container = document.getElementById('categoriesList');
-            container.innerHTML = state.categories.map(cat => `
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background-color: ${cat.color}"></span>
-                        <span class="text-xs font-medium text-zinc-200">${cat.name}</span>
-                    </div>
+            container.innerHTML = state.categories.map(c => `
+                <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs">
+                    <span class="flex items-center gap-2 text-zinc-200">
+                        <span class="w-3 h-3 rounded-full" style="background-color: ${c.color}"></span>
+                        ${c.name}
+                    </span>
+                    <span class="font-mono text-[10px] text-zinc-500">${c.color}</span>
                 </div>
             `).join('');
         }
 
         function getDefaultDateForCurrentMonth() {
-            const m = String(state.currentMonth + 1).padStart(2, '0');
-            return `${state.currentYear}-${m}-01`;
+            return `${getCurrentMonthPrefix()}-01`;
+        }
+
+        function populateCategorySelect() {
+            const sel = document.getElementById('txCategory');
+            sel.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
         function openDayModal(dateStr) {
-            resetTxForm(dateStr);
+            populateCategorySelect();
+            resetTxForm();
+            document.getElementById('txDate').value = dateStr;
+
             const [y, m, d] = dateStr.split('-').map(Number);
             const dateObj = new Date(y, m - 1, d);
-            document.getElementById('dayModalTitle').textContent = dateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('dayModalTitle').textContent = dateObj.toLocaleDateString('es-AR', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+
             renderDayTransactionsList(dateStr);
             document.getElementById('dayModal').classList.remove('hidden');
             lucide.createIcons();
@@ -2232,18 +2201,58 @@
             document.getElementById('dayModal').classList.add('hidden');
         }
 
+        function resetTxForm() {
+            document.getElementById('txId').value = '';
+            document.getElementById('txFormHeading').textContent = 'Nuevo Movimiento';
+            document.getElementById('cancelEditTxBtn').classList.add('hidden');
+            document.getElementById('txTitle').value = '';
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txNotes').value = '';
+            document.getElementById('txStatus').value = 'pending';
+            document.getElementById('txRecurring').checked = false;
+            document.getElementById('txRecurringWrapper').classList.remove('hidden');
+            const expenseRadio = document.querySelector('input[name="txType"][value="expense"]');
+            if (expenseRadio) expenseRadio.checked = true;
+        }
+
+        function editTransactionInDayModal(txId) {
+            const tx = state.transactions.find(t => t.id === txId);
+            if (!tx) return;
+            document.getElementById('txId').value = tx.id;
+            document.getElementById('txFormHeading').textContent = 'Editando Movimiento';
+            document.getElementById('cancelEditTxBtn').classList.remove('hidden');
+            const typeRadio = document.querySelector(`input[name="txType"][value="${tx.type}"]`);
+            if (typeRadio) typeRadio.checked = true;
+            document.getElementById('txTitle').value = tx.title;
+            document.getElementById('txAmount').value = tx.amount;
+            document.getElementById('txDate').value = tx.date;
+            document.getElementById('txCategory').value = tx.category;
+            document.getElementById('txStatus').value = tx.status;
+            document.getElementById('txNotes').value = tx.notes || '';
+            document.getElementById('txRecurringWrapper').classList.add('hidden');
+        }
+
+        function deleteTransactionFromDayModal(txId, dateStr) {
+            state.transactions = state.transactions.filter(t => t.id !== txId);
+            saveState();
+            renderDayTransactionsList(dateStr);
+            renderAll();
+            showToast('Movimiento eliminado', 'info');
+        }
+
         function renderDayTransactionsList(dateStr) {
             const container = document.getElementById('dayTransactionsList');
-            const txs = state.transactions.filter(t => t.date === dateStr);
+            const allMonthTxs = getMonthTransactions();
+            const txs = allMonthTxs.filter(t => t.date === dateStr && !t.isAutoCocoPayment);
+            const cocoDayTxs = allMonthTxs.filter(t => t.date === dateStr && t.isAutoCocoPayment);
             const projectedCards = getProjectedCardItemsForMonth(state.currentYear, state.currentMonth).filter(p => p.date === dateStr);
 
-            if (txs.length === 0 && projectedCards.length === 0) {
+            if (txs.length === 0 && cocoDayTxs.length === 0 && projectedCards.length === 0) {
                 container.innerHTML = `<p class="text-xs text-zinc-500 italic">Sin movimientos cargados este día.</p>`;
                 return;
             }
 
             const txHtml = txs.map(tx => {
-                const isInc = tx.type === 'income';
                 const cat = getCategoryById(tx.category);
                 return `
                     <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-2">
@@ -2252,22 +2261,32 @@
                                 <span class="w-2 h-2 rounded-full" style="background-color: ${cat.color}"></span>
                                 <span class="text-xs font-semibold text-white truncate">${tx.title}</span>
                             </div>
-                            <div class="text-[11px] text-zinc-400 mt-0.5">
-                                ${tx.status === 'completed' ? 'Efectivizado' : 'Pendiente'} ${tx.notes ? `· ${tx.notes}` : ''}
-                            </div>
+                            <span class="text-[10px] text-zinc-500 block mt-0.5">${cat.name} · ${tx.status === 'completed' ? 'Efectivizado' : 'Pendiente'}</span>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <span class="text-xs font-bold font-mono ${isInc ? 'text-emerald-400' : 'text-rose-400'}">${isInc ? '+' : '-'}${formatARS(tx.amount)}</span>
-                            <button type="button" onclick="editTx('${tx.id}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300" title="Editar">
-                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            <span class="text-xs font-bold font-mono ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${tx.type === 'income' ? '+' : '-'}${formatARS(tx.amount)}
+                            </span>
+                            <button type="button" onclick="editTransactionInDayModal('${tx.id}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white" title="Editar">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
                             </button>
-                            <button type="button" onclick="deleteTx('${tx.id}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950 text-rose-400" title="Eliminar">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <button type="button" onclick="deleteTransactionFromDayModal('${tx.id}', '${dateStr}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-rose-950/70 text-zinc-400 hover:text-rose-400" title="Eliminar">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            const cocoHtml = cocoDayTxs.map(cItem => `
+                <div class="p-3 rounded-xl bg-pink-950/30 border border-pink-500/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <span class="text-xs font-semibold text-pink-200 block truncate">${cItem.title}</span>
+                        <span class="text-[10px] text-zinc-400">Devolución a Cocó · Restado del cierre mensual</span>
+                    </div>
+                    <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatARS(cItem.amount)}</span>
+                </div>
+            `).join('');
 
             const estHtml = projectedCards.map(est => `
                 <div class="p-3 rounded-xl bg-indigo-950/35 border border-indigo-500/30 flex items-center justify-between gap-2">
@@ -2279,130 +2298,252 @@
                 </div>
             `).join('');
 
-            container.innerHTML = txHtml + estHtml;
+            container.innerHTML = txHtml + cocoHtml + estHtml;
             lucide.createIcons();
         }
 
-        function resetTxForm(dateStr = null) {
-            document.getElementById('txId').value = '';
-            document.getElementById('txFormHeading').textContent = 'Nuevo Movimiento';
-            document.getElementById('cancelEditTxBtn').classList.add('hidden');
-            document.getElementById('txRecurringWrapper').classList.remove('hidden');
-            document.getElementById('txTitle').value = '';
-            document.getElementById('txAmount').value = '';
-            if (dateStr) document.getElementById('txDate').value = dateStr;
-            document.getElementById('txStatus').value = 'pending';
-            document.getElementById('txNotes').value = '';
-            document.getElementById('txRecurring').checked = false;
-            const expRadio = document.querySelector('input[name="txType"][value="expense"]');
-            if (expRadio) expRadio.checked = true;
+        // =====================================================================
+        // MASTER RENDER & EVENT LISTENERS
+        // =====================================================================
+        function renderAll() {
+            renderHeader();
+            renderKPIs();
+            renderBreakdownSection();
+            renderLiquidityAndCards();
+            renderCocoGoal();
+            renderRoadmapTable();
+            renderCalendar();
+            renderMonthMovementsList();
+            renderCashflowChart();
+            lucide.createIcons();
         }
 
-        function editTx(id) {
-            const tx = state.transactions.find(t => t.id === id);
-            if (!tx) return;
-            document.getElementById('txId').value = tx.id;
-            document.getElementById('txFormHeading').textContent = 'Editando Movimiento';
-            document.getElementById('cancelEditTxBtn').classList.remove('hidden');
-            document.getElementById('txRecurringWrapper').classList.add('hidden');
-            const radio = document.querySelector(`input[name="txType"][value="${tx.type}"]`);
-            if (radio) radio.checked = true;
-            document.getElementById('txTitle').value = tx.title;
-            document.getElementById('txAmount').value = tx.amount;
-            document.getElementById('txDate').value = tx.date;
-            document.getElementById('txCategory').value = tx.category;
-            document.getElementById('txStatus').value = tx.status;
-            document.getElementById('txNotes').value = tx.notes || '';
-        }
-
-        function deleteTx(id) {
-            const tx = state.transactions.find(t => t.id === id);
-            const dateStr = tx ? tx.date : getDefaultDateForCurrentMonth();
-            state.transactions = state.transactions.filter(t => t.id !== id);
-            saveState();
-            renderDayTransactionsList(dateStr);
-            renderAll();
-            showToast('Movimiento eliminado', 'info');
-        }
-
-        function toggleTxStatus(id) {
-            const tx = state.transactions.find(t => t.id === id);
-            if (!tx) return;
-            tx.status = tx.status === 'completed' ? 'pending' : 'completed';
-            saveState();
-            renderAll();
-            showToast(tx.status === 'completed' ? 'Marcado como efectivizado' : 'Marcado como pendiente', 'success');
-        }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const colors = {
-                success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
-                error: 'bg-rose-950/95 border-rose-500/40 text-rose-200',
-                info: 'bg-zinc-900/95 border-zinc-700 text-zinc-200'
-            };
-            const el = document.createElement('div');
-            el.className = `pointer-events-auto px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl transition-all ${colors[type] || colors.info}`;
-            el.textContent = message;
-            container.appendChild(el);
-            setTimeout(() => {
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 250);
-            }, 2600);
-        }
-
-        // =========================================================================
-        // EVENT LISTENERS
-        // =========================================================================
         function setupEventListeners() {
-            document.getElementById('usdRateInput').addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                if (!isNaN(val) && val > 0) {
-                    state.usdToArsRate = val;
-                    saveState();
-                    renderLiquidityAndCards();
-                    renderCocoGoal();
-                    renderRoadmapTable();
-                }
-            });
-
+            // Navegación de meses
             document.getElementById('prevMonthBtn').addEventListener('click', () => {
-                syncCurrentMonthCardsSnapshot();
-                state.currentMonth--;
-                if (state.currentMonth < 0) {
-                    state.currentMonth = 11;
-                    state.currentYear--;
-                }
-                loadCardsForMonth(getCurrentMonthPrefix());
+                const prev = getPrevYearMonth(state.currentYear, state.currentMonth);
+                state.currentYear = prev.year;
+                state.currentMonth = prev.month;
                 saveState();
                 renderAll();
             });
 
             document.getElementById('nextMonthBtn').addEventListener('click', () => {
-                syncCurrentMonthCardsSnapshot();
-                state.currentMonth++;
-                if (state.currentMonth > 11) {
-                    state.currentMonth = 0;
-                    state.currentYear++;
-                }
-                loadCardsForMonth(getCurrentMonthPrefix());
+                const next = getNextYearMonth(state.currentYear, state.currentMonth);
+                state.currentYear = next.year;
+                state.currentMonth = next.month;
                 saveState();
                 renderAll();
             });
 
-            document.getElementById('openCategoriesBtn').addEventListener('click', openCategoriesModal);
+            // Cotización USD/USDT editable en tiempo real
+            document.getElementById('usdRateInput').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val) && val > 0) {
+                    state.usdToArsRate = val;
+                    saveState();
+                    renderAll();
+                }
+            });
 
+            // Toggle Hoja de Ruta
+            document.getElementById('toggleRoadmapBtn').addEventListener('click', () => {
+                const sec = document.getElementById('roadmapSection');
+                const chev = document.getElementById('roadmapChevron');
+                sec.classList.toggle('hidden');
+                chev.style.transform = sec.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+
+            // Filtros de lista lateral
+            document.querySelectorAll('.filter-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.filter = btn.dataset.filter;
+                    document.querySelectorAll('.filter-chip').forEach(b => {
+                        b.className = b.dataset.filter === state.filter
+                            ? 'filter-chip px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium'
+                            : 'filter-chip px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white';
+                    });
+                    renderMonthMovementsList();
+                    lucide.createIcons();
+                });
+            });
+
+            // Preview vivo en modal de tarjetas
+            ['mbAmount', 'mbLimit', 'mbTaxRate'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    if (document.getElementById('mbGroup').value === 'card') {
+                        updateManualBarCardPreview();
+                    }
+                });
+            });
+
+            // Guardar barra manual (liquidez o tarjeta)
+            document.getElementById('manualBarForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const group = document.getElementById('mbGroup').value;
+                const id = document.getElementById('mbId').value;
+                const name = document.getElementById('mbName').value.trim();
+                const amount = Math.max(0, parseFloat(document.getElementById('mbAmount').value) || 0);
+                const limit = Math.max(0, parseFloat(document.getElementById('mbLimit').value) || 0);
+
+                if (group === 'liquidity') {
+                    state.liquidity[id] = { name, amount, refMax: limit };
+                } else {
+                    const taxRate = Math.max(0, parseFloat(document.getElementById('mbTaxRate').value) || 0);
+                    const cards = getCardsForMonth(state.currentYear, state.currentMonth);
+                    const card = cards.find(c => c.id === id);
+                    if (card) {
+                        card.name = name;
+                        card.available = amount;
+                        card.limit = limit;
+                        card.taxRate = taxRate;
+                    }
+                }
+                saveState();
+                closeManualBarModal();
+                renderAll();
+                showToast('Saldo actualizado correctamente', 'success');
+            });
+
+            // Guardar objetivo Cocó (y descontar diferencia en el saldo final del mes activo)
+            document.getElementById('cocoForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const prevTotal = Math.max(0, Number(state.cocoGoal.paid) || 0);
+                const newTotal = Math.max(0, parseFloat(document.getElementById('cocoPaidInput').value) || 0);
+                const deltaUsd = newTotal - prevTotal;
+                const monthKey = getCurrentMonthPrefix();
+
+                state.cocoGoal.title = document.getElementById('cocoTitleInput').value.trim() || 'Devolución a Cocó';
+                if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
+                const currentMonthPaid = Math.max(0, Number(state.cocoGoal.paymentsByMonth[monthKey]) || 0);
+                state.cocoGoal.paymentsByMonth[monthKey] = Math.max(0, currentMonthPaid + deltaUsd);
+                state.cocoGoal.paid = newTotal;
+                state.cocoGoal.target = Math.max(1, parseFloat(document.getElementById('cocoTargetInput').value) || 2500);
+
+                saveState();
+                closeCocoModal();
+                renderAll();
+                showToast('Objetivo Cocó y saldo final del mes actualizados', 'success');
+            });
+
+            // Agregar nuevo préstamo
+            document.getElementById('addLoanForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('newLoanName').value.trim();
+                const decInstallment = Math.max(1, parseInt(document.getElementById('newLoanDecInst').value, 10) || 1);
+                const totalInstallments = Math.max(decInstallment, parseInt(document.getElementById('newLoanTotalInst').value, 10) || 12);
+                const installmentAmount = Math.max(0, parseFloat(document.getElementById('newLoanInstallmentAmt').value) || 0);
+
+                state.loans.push({
+                    id: `loan_${Date.now()}`,
+                    name,
+                    decInstallment,
+                    totalInstallments,
+                    installmentAmount
+                });
+                saveState();
+                document.getElementById('addLoanForm').reset();
+                renderLoansEditorList();
+                renderRoadmapTable();
+                showToast('Préstamo agregado a la hoja de ruta', 'success');
+            });
+
+            // Guardar fila hoja de ruta
+            document.getElementById('roadmapRowForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const idx = parseInt(document.getElementById('rmRowIndex').value, 10);
+                if (state.roadmapExtras[idx]) {
+                    state.roadmapExtras[idx].cocoDebt = Math.max(0, parseFloat(document.getElementById('rmCocoDebt').value) || 0);
+                    state.roadmapExtras[idx].netSaved = parseFloat(document.getElementById('rmNetSaved').value) || 0;
+                }
+                saveState();
+                closeRoadmapRowModal();
+                renderRoadmapTable();
+                showToast('Fila actualizada', 'success');
+            });
+
+            // Categorías
+            document.getElementById('openCategoriesBtn').addEventListener('click', openCategoriesModal);
+            document.getElementById('newCategoryForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('newCatName').value.trim();
+                const color = document.getElementById('newCatColor').value;
+                if (!name) return;
+                state.categories.push({ id: `cat_${Date.now()}`, name, color });
+                saveState();
+                document.getElementById('newCatName').value = '';
+                renderCategoriesList();
+                showToast('Categoría creada', 'success');
+            });
+
+            // Formulario de movimiento en día
+            document.getElementById('txForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const txId = document.getElementById('txId').value;
+                const type = document.querySelector('input[name="txType"]:checked').value;
+                const title = document.getElementById('txTitle').value.trim();
+                const amount = Math.max(0, parseFloat(document.getElementById('txAmount').value) || 0);
+                const date = document.getElementById('txDate').value;
+                const category = document.getElementById('txCategory').value;
+                const status = document.getElementById('txStatus').value;
+                const notes = document.getElementById('txNotes').value.trim();
+                const isRecurring = document.getElementById('txRecurring').checked;
+
+                if (txId) {
+                    const existing = state.transactions.find(t => t.id === txId);
+                    if (existing) {
+                        Object.assign(existing, { type, title, amount, date, category, status, notes });
+                    }
+                    showToast('Movimiento actualizado', 'success');
+                } else {
+                    const baseTx = {
+                        id: `tx_${Date.now()}`,
+                        date,
+                        type,
+                        title,
+                        amount,
+                        category,
+                        status,
+                        notes
+                    };
+                    state.transactions.push(baseTx);
+
+                    if (isRecurring) {
+                        const [y, m, d] = date.split('-').map(Number);
+                        for (let offset = 1; offset <= 6; offset++) {
+                            const futureDate = new Date(y, m - 1 + offset, d);
+                            const fStr = `${futureDate.getFullYear()}-${String(futureDate.getMonth() + 1).padStart(2, '0')}-${String(futureDate.getDate()).padStart(2, '0')}`;
+                            state.transactions.push({
+                                ...baseTx,
+                                id: `tx_${Date.now()}_${offset}`,
+                                date: fStr,
+                                status: 'pending'
+                            });
+                        }
+                    }
+                    showToast(isRecurring ? 'Movimiento creado + 6 meses' : 'Movimiento agregado', 'success');
+                }
+
+                saveState();
+                resetTxForm();
+                document.getElementById('txDate').value = date;
+                renderDayTransactionsList(date);
+                renderAll();
+            });
+
+            // Exportar JSON
             document.getElementById('exportJsonBtn').addEventListener('click', () => {
                 const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `gestion-anc-26-27-${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `Gestion-ANC-26-27_${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
                 showToast('Respaldo JSON descargado', 'success');
             });
 
+            // Importar JSON
             document.getElementById('importJsonInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -2411,11 +2552,10 @@
                     try {
                         const imported = JSON.parse(ev.target.result);
                         state = { ...state, ...imported };
-                        normalizeCardsState();
-                        normalizeLoansAndRoadmapState();
+                        normalizeState();
                         saveState();
                         renderAll();
-                        showToast('Datos importados correctamente', 'success');
+                        showToast('Respaldo importado correctamente', 'success');
                     } catch (err) {
                         showToast('Archivo JSON inválido', 'error');
                     }
@@ -2424,174 +2564,41 @@
                 e.target.value = '';
             });
 
+            // Restaurar datos base
             document.getElementById('resetSheetBtn').addEventListener('click', () => {
-                loadSheet2026Data(true);
-            });
-
-            document.getElementById('toggleRoadmapBtn').addEventListener('click', () => {
-                const sec = document.getElementById('roadmapSection');
-                const chev = document.getElementById('roadmapChevron');
-                sec.classList.toggle('hidden');
-                chev.classList.toggle('rotate-180');
-            });
-
-            document.querySelectorAll('.filter-chip').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    listFilter = btn.dataset.filter;
-                    renderMonthMovementsList();
-                    lucide.createIcons();
-                });
-            });
-
-            // Live preview al editar saldo disponible/límite/taxes de tarjeta
-            ['mbAmount', 'mbLimit', 'mbTaxRate'].forEach(inputId => {
-                document.getElementById(inputId).addEventListener('input', updateCardModalPreview);
-            });
-
-            document.getElementById('manualBarForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const group = document.getElementById('mbGroup').value;
-                const id = document.getElementById('mbId').value;
-                const name = document.getElementById('mbName').value.trim();
-                const amount = parseFloat(document.getElementById('mbAmount').value) || 0;
-                const limit = parseFloat(document.getElementById('mbLimit').value) || 0;
-
-                if (group === 'liquidity') {
-                    state.liquidity[id].name = name;
-                    state.liquidity[id].amount = amount;
-                    state.liquidity[id].reference = Math.max(1, limit);
-                    saveState();
-                    closeManualBarModal();
-                    renderAll();
-                    showToast('Saldo manual actualizado', 'success');
-                } else {
-                    const card = state.cards.find(c => c.id === id);
-                    if (card) {
-                        const taxRate = Math.max(0, parseFloat(document.getElementById('mbTaxRate').value) || 0);
-                        card.name = name;
-                        card.available = Math.max(0, amount);
-                        card.limit = Math.max(0, limit);
-                        card.taxRate = taxRate;
-                        syncCurrentMonthCardsSnapshot();
-                    }
-                    saveState();
-                    closeManualBarModal();
-                    renderAll();
-                    showToast('Tarjeta y vencimiento al 4to día hábil actualizados', 'success');
-                }
-            });
-
-            document.getElementById('cocoForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                state.cocoGoal.title = document.getElementById('cocoTitleInput').value.trim() || 'Devolución a Cocó';
-                state.cocoGoal.paid = Math.max(0, parseFloat(document.getElementById('cocoPaidInput').value) || 0);
-                state.cocoGoal.target = Math.max(1, parseFloat(document.getElementById('cocoTargetInput').value) || 2500);
+                localStorage.removeItem(STORAGE_KEY);
+                state = {
+                    currentYear: 2026,
+                    currentMonth: 11,
+                    usdToArsRate: 1200,
+                    filter: 'all',
+                    breakdownOpen: false,
+                    breakdownTab: 'both',
+                    categories: DEFAULT_CATEGORIES.map(c => ({ ...c })),
+                    transactions: INITIAL_TRANSACTIONS.map(t => ({ ...t })),
+                    liquidity: {
+                        bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
+                        usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
+                    },
+                    cardsHistoryByMonth: {
+                        '2026-12': BASE_CARDS_CONFIG.map(c => ({ ...c }))
+                    },
+                    overriddenCardBills: {},
+                    cocoGoal: { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} },
+                    loans: DEFAULT_LOANS_LIST.map(l => ({ ...l })),
+                    roadmapExtras: DEFAULT_ROADMAP_EXTRAS.map(r => ({ ...r }))
+                };
                 saveState();
-                closeCocoModal();
-                renderCocoGoal();
-                showToast('Objetivo Cocó actualizado', 'success');
-            });
-
-            document.getElementById('addLoanForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('newLoanName').value.trim();
-                const decPaidInstallment = Math.max(1, parseInt(document.getElementById('newLoanDecInst').value, 10) || 1);
-                const totalInstallments = Math.max(decPaidInstallment, parseInt(document.getElementById('newLoanTotalInst').value, 10) || 12);
-                const installmentAmount = Math.max(1, parseFloat(document.getElementById('newLoanInstallmentAmt').value) || 0);
-
-                state.loans.push({
-                    id: 'loan_' + Date.now(),
-                    name,
-                    decPaidInstallment,
-                    totalInstallments,
-                    installmentAmount
-                });
-                saveState();
-                e.target.reset();
-                renderLoansEditorList();
-                renderRoadmapTable();
-                showToast('Préstamo agregado a la hoja de ruta', 'success');
-            });
-
-            document.getElementById('roadmapRowForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const idx = parseInt(document.getElementById('rmRowIndex').value, 10);
-                const row = state.roadmapPlan[idx];
-                if (row) {
-                    row.cocoDebt = Math.max(0, parseFloat(document.getElementById('rmCocoDebt').value) || 0);
-                    row.netSaved = parseFloat(document.getElementById('rmNetSaved').value) || 0;
-                    saveState();
-                    renderRoadmapTable();
-                }
-                closeRoadmapRowModal();
-                showToast('Fila actualizada', 'success');
-            });
-
-            document.getElementById('newCategoryForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('newCatName').value.trim();
-                const color = document.getElementById('newCatColor').value;
-                if (!name) return;
-                state.categories.push({ id: 'cat_' + Date.now(), name, color });
-                saveState();
-                e.target.reset();
-                renderCategoriesList();
-                renderCategorySelect();
-                showToast('Categoría creada', 'success');
-            });
-
-            document.getElementById('txForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const id = document.getElementById('txId').value;
-                const type = document.querySelector('input[name="txType"]:checked').value;
-                const title = document.getElementById('txTitle').value.trim();
-                const amount = Math.max(0, parseFloat(document.getElementById('txAmount').value) || 0);
-                const date = document.getElementById('txDate').value;
-                const category = document.getElementById('txCategory').value;
-                const status = document.getElementById('txStatus').value;
-                const notes = document.getElementById('txNotes').value.trim();
-                const recurring = document.getElementById('txRecurring').checked;
-
-                if (!title || !date) return;
-
-                if (id) {
-                    const idx = state.transactions.findIndex(t => t.id === id);
-                    if (idx !== -1) {
-                        state.transactions[idx] = { id, type, title, amount, date, category, status, notes };
-                    }
-                    showToast('Movimiento actualizado', 'success');
-                } else {
-                    const baseId = 'tx_' + Date.now();
-                    state.transactions.push({ id: baseId, type, title, amount, date, category, status, notes });
-
-                    if (recurring) {
-                        const [y, m, d] = date.split('-').map(Number);
-                        for (let i = 1; i <= 6; i++) {
-                            const nextD = new Date(y, m - 1 + i, d);
-                            const nextDateStr = `${nextD.getFullYear()}-${String(nextD.getMonth() + 1).padStart(2, '0')}-${String(nextD.getDate()).padStart(2, '0')}`;
-                            state.transactions.push({
-                                id: `${baseId}_r${i}`,
-                                type,
-                                title,
-                                amount,
-                                date: nextDateStr,
-                                category,
-                                status: 'pending',
-                                notes
-                            });
-                        }
-                    }
-                    showToast(recurring ? 'Movimiento creado con recurrencia' : 'Movimiento agregado', 'success');
-                }
-
-                saveState();
-                resetTxForm(date);
-                renderDayTransactionsList(date);
                 renderAll();
+                showToast('Datos base restaurados', 'info');
             });
         }
 
-        window.addEventListener('DOMContentLoaded', initApp);
+        window.onload = function () {
+            loadState();
+            setupEventListeners();
+            renderAll();
+        };
     </script>
 </body>
 </html>
