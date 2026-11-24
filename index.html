@@ -64,8 +64,8 @@
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-30 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <!-- Brand & Month Selector -->
-            <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
+            <!-- Brand, Month Selector & USD/USDT Rate -->
+            <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
                 <div class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                         <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
@@ -96,6 +96,12 @@
                     <span class="text-xs font-mono text-teal-400">$</span>
                     <input type="number" step="any" id="usdRateInput" value="1200" class="w-16 bg-zinc-950 border border-zinc-800 rounded-lg px-1.5 py-0.5 text-xs font-mono font-bold text-teal-300 focus:outline-none focus:border-teal-400">
                 </div>
+
+                <!-- Selector Visual de Moneda Principal -->
+                <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl p-0.5 text-xs font-mono">
+                    <button type="button" id="currencyArsBtn" onclick="setDisplayCurrency('ARS')" class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-semibold">ARS</button>
+                    <button type="button" id="currencyUsdBtn" onclick="setDisplayCurrency('USD')" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white font-semibold">USD</button>
+                </div>
             </div>
 
             <!-- Action Controls -->
@@ -124,10 +130,22 @@
     <main class="max-w-[1440px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
 
         <!-- ================================================================= -->
-        <!-- 1. KPI CARDS DEL MES (FLUJO DEL CALENDARIO)                       -->
+        <!-- 1. KPI CARDS DEL MES                                              -->
         <!-- ================================================================= -->
         <section class="space-y-3">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Balance Real Actual del Mes -->
+                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-zinc-400">Balance Real (Efectivizado)</span>
+                        <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+                    <div id="kpiRealBalance" class="text-2xl font-bold font-mono tabular-nums text-white">$ 0</div>
+                    <p class="text-xs text-zinc-500 mt-1">Ingresos cobrados - egresos pagados (incl. Cocó)</p>
+                </div>
+
                 <!-- Ingresos del Mes -->
                 <div onclick="toggleBreakdownPanel('income')" class="cursor-pointer group bg-zinc-900/90 border border-zinc-800/90 hover:border-emerald-500/50 rounded-2xl p-4 sm:p-5 shadow-lg transition-all">
                     <div class="flex items-center justify-between mb-2">
@@ -143,7 +161,7 @@
                     <p id="kpiIncomeBreakdown" class="text-xs text-zinc-500 mt-1">Cobrado: $ 0 · Pendiente: $ 0</p>
                 </div>
 
-                <!-- Egresos del Mes -->
+                <!-- Egresos & Vencimientos del Mes -->
                 <div onclick="toggleBreakdownPanel('expense')" class="cursor-pointer group bg-zinc-900/90 border border-zinc-800/90 hover:border-rose-500/50 rounded-2xl p-4 sm:p-5 shadow-lg transition-all">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
@@ -158,19 +176,7 @@
                     <p id="kpiExpenseBreakdown" class="text-xs text-zinc-500 mt-1">Pagado: $ 0 · Pendiente: $ 0</p>
                 </div>
 
-                <!-- Saldo Real Actual del Mes -->
-                <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-zinc-400">Balance Real (Efectivizado)</span>
-                        <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                        </span>
-                    </div>
-                    <div id="kpiRealBalance" class="text-2xl font-bold font-mono tabular-nums text-white">$ 0</div>
-                    <p class="text-xs text-zinc-500 mt-1">Solo movimientos ya cobrados/pagados</p>
-                </div>
-
-                <!-- Saldo Proyectado Cierre de Mes -->
+                <!-- Proyección Cierre de Mes (Banco + USDT en ARS + Ingresos - Egresos) -->
                 <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-lg">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs font-medium text-zinc-400">Proyección Cierre de Mes</span>
@@ -179,7 +185,7 @@
                         </span>
                     </div>
                     <div id="kpiProjectedBalance" class="text-2xl font-bold font-mono tabular-nums text-amber-300">$ 0</div>
-                    <p class="text-xs text-zinc-500 mt-1">Incluye vencimientos, tarjetas y Cocó</p>
+                    <p id="kpiProjectedBreakdown" class="text-[11px] text-zinc-400 mt-1 leading-snug">Banco + USDT(ARS) + Ingresos - Egresos</p>
                 </div>
             </div>
 
@@ -199,9 +205,7 @@
                         </button>
                     </div>
                 </div>
-                <div id="breakdownPanelContent" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Rendered dynamically -->
-                </div>
+                <div id="breakdownPanelContent" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
             </div>
         </section>
 
@@ -209,7 +213,7 @@
         <!-- 2. SALDOS MANUALES (CUENTA, USDT, 4 TARJETAS) + META ÚNICA COCÓ   -->
         <!-- ================================================================= -->
         <section class="grid grid-cols-1 xl:grid-cols-12 gap-5">
-            
+
             <!-- Liquidez Manual + 4 Tarjetas Disponibles (8 cols) -->
             <div class="xl:col-span-8 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
@@ -301,9 +305,7 @@
                         </div>
                     </div>
 
-                    <div id="cardsBarsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="cardsBarsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
 
                     <!-- Banner resumen automático de cuánto vendrá el mes siguiente -->
                     <div class="bg-indigo-950/35 border border-indigo-500/30 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -410,18 +412,13 @@
                         En <strong class="text-zinc-200">Diciembre 2026</strong> se paga <strong class="text-indigo-300">Cuota 4/12 Galicia</strong> y <strong class="text-indigo-300">Cuota 2/12 Naranja X</strong> (sin precancelación). Podés editar o eliminar préstamos y hacer clic en cualquier fila para ajustar Cocó o Neto.
                     </p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="openLoansConfigModal()" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-xs font-medium text-indigo-300 flex items-center gap-1.5 transition-colors">
-                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-                        <span>Editar / Eliminar Préstamos</span>
-                    </button>
-                </div>
+                <button type="button" onclick="openLoansConfigModal()" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-xs font-medium text-indigo-300 flex items-center gap-1.5 transition-colors">
+                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                    <span>Editar / Eliminar Préstamos</span>
+                </button>
             </div>
 
-            <!-- Estado vivo de préstamos -->
-            <div id="loansLiveSummaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <!-- Rendered dynamically -->
-            </div>
+            <div id="loansLiveSummaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
@@ -435,9 +432,7 @@
                             <th class="py-2.5 px-3 text-right">Neto Acumulado</th>
                         </tr>
                     </thead>
-                    <tbody id="roadmapTableBody" class="divide-y divide-zinc-800/70 font-mono">
-                        <!-- Rendered dynamically -->
-                    </tbody>
+                    <tbody id="roadmapTableBody" class="divide-y divide-zinc-800/70 font-mono"></tbody>
                 </table>
             </div>
         </section>
@@ -446,7 +441,7 @@
         <!-- 3. CALENDARIO INTERACTIVO + VENCIMIENTOS & GRÁFICO                -->
         <!-- ================================================================= -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
+
             <!-- Calendario Mensual (8 cols) -->
             <div class="lg:col-span-8 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-xl">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -478,20 +473,18 @@
                 </div>
 
                 <!-- Grilla de días -->
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5">
-                    <!-- Rendered dynamically -->
-                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
             </div>
 
-            <!-- Panel Lateral: Vencimientos del Mes + Desglose + Gráfico (4 cols) -->
+            <!-- Panel Lateral: Movimientos & Vencimientos + Desglose + Gráfico (4 cols) -->
             <div class="lg:col-span-4 space-y-6">
-                
+
                 <!-- Lista de Movimientos & Vencimientos del Mes -->
                 <div class="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-5 shadow-xl flex flex-col max-h-[460px]">
                     <div class="flex items-center justify-between gap-2 mb-3">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
                             <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
-                            Movimientos del Mes
+                            Vencimientos & Movimientos
                         </h3>
                         <button type="button" onclick="openDayModal(getDefaultDateForCurrentMonth())" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white flex items-center gap-1 transition-colors">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -507,9 +500,7 @@
                         <button type="button" data-filter="expense" class="filter-chip px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white">Egresos</button>
                     </div>
 
-                    <div id="monthMovementsList" class="space-y-2 overflow-y-auto pr-1 flex-1">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="monthMovementsList" class="space-y-2 overflow-y-auto pr-1 flex-1"></div>
                 </div>
 
                 <!-- Resumen Desglosado Rápido por Categoría -->
@@ -521,9 +512,7 @@
                         </h3>
                         <button type="button" onclick="openBreakdownAndScroll()" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-2">Ver detalle completo</button>
                     </div>
-                    <div id="sidebarCategoryBreakdown" class="space-y-2.5">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="sidebarCategoryBreakdown" class="space-y-2.5"></div>
                 </div>
 
                 <!-- Gráfico Analítico del Mes -->
@@ -574,7 +563,6 @@
                     </div>
                 </div>
 
-                <!-- Sección exclusiva de tarjetas: Utilizado + Taxes => Vencimiento 4to día hábil -->
                 <div id="mbCardCalcSection" class="hidden space-y-3 pt-2 border-t border-zinc-800">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex-1">
@@ -638,7 +626,7 @@
                         <input type="number" step="any" id="cocoTargetInput" required class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-mono text-white focus:outline-none focus:border-pink-500">
                     </div>
                 </div>
-                <p class="text-[11px] text-zinc-400">Cualquier diferencia sumada o restada se imputará automáticamente como egreso en el mes visible.</p>
+                <p class="text-[11px] text-zinc-400">Cualquier diferencia sumada o restada en el mes activo se descuenta en pesos (según USD/USDT) como egreso efectivizado.</p>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeCocoModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300">Cancelar</button>
                     <button type="submit" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-xs font-semibold text-white">Guardar</button>
@@ -662,11 +650,8 @@
                 </button>
             </div>
 
-            <div id="loansEditorList" class="space-y-3">
-                <!-- Rendered dynamically -->
-            </div>
+            <div id="loansEditorList" class="space-y-3"></div>
 
-            <!-- Agregar nuevo préstamo -->
             <form id="addLoanForm" class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-3">
                 <div class="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
                     <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
@@ -731,9 +716,7 @@
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
-            <div id="categoriesList" class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                <!-- Rendered dynamically -->
-            </div>
+            <div id="categoriesList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
             <form id="newCategoryForm" class="flex items-center gap-2 pt-3 border-t border-zinc-800">
                 <input type="color" id="newCatColor" value="#6366f1" class="w-9 h-9 rounded-lg bg-zinc-950 border border-zinc-800 cursor-pointer">
                 <input type="text" id="newCatName" placeholder="Nueva categoría..." required class="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -757,12 +740,8 @@
                 </button>
             </div>
 
-            <!-- Lista de movimientos existentes ese día -->
-            <div id="dayTransactionsList" class="space-y-2">
-                <!-- Rendered dynamically -->
-            </div>
+            <div id="dayTransactionsList" class="space-y-2"></div>
 
-            <!-- Formulario Alta / Edición -->
             <form id="txForm" class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-3">
                 <input type="hidden" id="txId">
                 <div class="flex items-center justify-between">
@@ -835,8 +814,7 @@
     <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
     <!-- ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'gestion_anc_26_27_v2';
-        const LEGACY_STORAGE_KEYS = ['gestion_anc_26_27_v1', 'finflow_v5_agustin', 'finflow_v4_agustin'];
+        const STORAGE_KEY = 'finflow_v2_agustin';
 
         const DEFAULT_CATEGORIES = [
             { id: 'cat_sueldo', name: 'Sueldo & Comisiones', color: '#10b981' },
@@ -861,26 +839,26 @@
         ];
 
         const DEFAULT_ROADMAP_EXTRAS = [
-            { monthIndex: 0, label: 'Diciembre 2026', year: 2026, month: 11, cocoDebt: 3840000, netSaved: 0 },
-            { monthIndex: 1, label: 'Enero 2027', year: 2027, month: 0, cocoDebt: 3680000, netSaved: 0 },
-            { monthIndex: 2, label: 'Febrero 2027', year: 2027, month: 1, cocoDebt: 3520000, netSaved: 0 },
-            { monthIndex: 3, label: 'Marzo 2027', year: 2027, month: 2, cocoDebt: 3200000, netSaved: 474496 },
-            { monthIndex: 4, label: 'Abril 2027', year: 2027, month: 3, cocoDebt: 2720000, netSaved: 631496 },
-            { monthIndex: 5, label: 'Mayo 2027', year: 2027, month: 4, cocoDebt: 1920000, netSaved: 1018496 },
-            { monthIndex: 6, label: 'Junio 2027', year: 2027, month: 5, cocoDebt: 0, netSaved: 985496 }
+            { monthIndex: 0, label: 'Diciembre 2026', year: 2026, month: 11, cocoDebt: 3000000, netSaved: 0 },
+            { monthIndex: 1, label: 'Enero 2027', year: 2027, month: 0, cocoDebt: 3000000, netSaved: 0 },
+            { monthIndex: 2, label: 'Febrero 2027', year: 2027, month: 1, cocoDebt: 3000000, netSaved: 0 },
+            { monthIndex: 3, label: 'Marzo 2027', year: 2027, month: 2, cocoDebt: 3000000, netSaved: 474496 },
+            { monthIndex: 4, label: 'Abril 2027', year: 2027, month: 3, cocoDebt: 3000000, netSaved: 631496 },
+            { monthIndex: 5, label: 'Mayo 2027', year: 2027, month: 4, cocoDebt: 3000000, netSaved: 1018496 },
+            { monthIndex: 6, label: 'Junio 2027', year: 2027, month: 5, cocoDebt: 3000000, netSaved: 985496 }
         ];
 
         const INITIAL_TRANSACTIONS = [
             // Puente final Noviembre 2026 visible dentro del inicio de Diciembre
-            { id: 'tx_nov_lela', date: '2026-11-20', type: 'income', title: 'Regalo Lela', amount: 170000, category: 'cat_extras', status: 'completed', notes: 'Ingreso puente hacia Diciembre' },
-            { id: 'tx_nov_owa', date: '2026-11-27', type: 'income', title: 'OWA', amount: 250000, category: 'cat_extras', status: 'pending', notes: 'Ingreso fin de mes' },
+            { id: 'tx_nov_lela', date: '2026-11-23', type: 'income', title: 'Regalo Lela', amount: 170000, category: 'cat_extras', status: 'completed', notes: 'Ingreso puente Noviembre' },
+            { id: 'tx_nov_owa', date: '2026-11-27', type: 'income', title: 'OWA', amount: 250000, category: 'cat_extras', status: 'pending', notes: 'Ingreso puente Noviembre' },
 
             // DICIEMBRE 2026 (4to día hábil = 04/12/2026)
-            { id: 'tx_dic_sueldo', date: '2026-12-04', type: 'income', title: 'Sueldo Global Diciembre', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: 'Primer quincena' },
-            { id: 'tx_dic_tc_amex', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia AMEX (Dic)', amount: 850000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
-            { id: 'tx_dic_tc_master', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia Master (Dic)', amount: 743077, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
-            { id: 'tx_dic_tc_nx', date: '2026-12-04', type: 'expense', title: 'Vto. Naranja X (Dic)', amount: 250000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
-            { id: 'tx_dic_tc_carrefour', date: '2026-12-04', type: 'expense', title: 'Vto. Carrefour Banco (Dic)', amount: 300000, category: 'cat_tarjetas', status: 'pending', notes: 'Editable desde desglose o calendario' },
+            { id: 'tx_dic_sueldo', date: '2026-12-04', type: 'income', title: 'Sueldo Global Diciembre', amount: 1300000, category: 'cat_sueldo', status: 'pending', notes: 'Sueldo mensual' },
+            { id: 'tx_dic_tc_amex', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia AMEX (Dic)', amount: 850000, category: 'cat_tarjetas', status: 'pending', notes: 'Vencimiento Diciembre' },
+            { id: 'tx_dic_tc_master', date: '2026-12-04', type: 'expense', title: 'Vto. Galicia Master (Dic)', amount: 743077, category: 'cat_tarjetas', status: 'pending', notes: 'Vencimiento Diciembre' },
+            { id: 'tx_dic_tc_nx', date: '2026-12-04', type: 'expense', title: 'Vto. Naranja X (Dic)', amount: 250000, category: 'cat_tarjetas', status: 'pending', notes: 'Vencimiento Diciembre' },
+            { id: 'tx_dic_tc_carrefour', date: '2026-12-04', type: 'expense', title: 'Vto. Carrefour Banco (Dic)', amount: 300000, category: 'cat_tarjetas', status: 'pending', notes: 'Vencimiento Diciembre' },
             { id: 'tx_dic_galicia', date: '2026-12-09', type: 'expense', title: 'Préstamo Galicia (Cuota 4/12)', amount: 263000, category: 'cat_prestamos', status: 'pending', notes: 'Quedan 8 cuotas tras Dic' },
             { id: 'tx_dic_naranja', date: '2026-12-10', type: 'expense', title: 'Préstamo Naranja X (Cuota 2/12)', amount: 125000, category: 'cat_prestamos', status: 'pending', notes: 'Quedan 10 cuotas tras Dic' },
             { id: 'tx_dic_aguinaldo', date: '2026-12-24', type: 'income', title: 'Aguinaldo Diciembre', amount: 700000, category: 'cat_sueldo', status: 'pending', notes: 'SAC Diciembre' },
@@ -957,13 +935,14 @@
         // =====================================================================
         let state = {
             currentYear: 2026,
-            currentMonth: 11, // Diciembre 2026 por defecto
+            currentMonth: 11, // Diciembre 2026
+            displayCurrency: 'ARS',
             usdToArsRate: 1200,
             filter: 'all',
             breakdownOpen: false,
             breakdownTab: 'both',
-            categories: DEFAULT_CATEGORIES,
-            transactions: INITIAL_TRANSACTIONS,
+            categories: DEFAULT_CATEGORIES.map(c => ({ ...c })),
+            transactions: INITIAL_TRANSACTIONS.map(t => ({ ...t })),
             liquidity: {
                 bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
                 usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
@@ -984,9 +963,116 @@
 
         let cashflowChartInstance = null;
 
+        function normalizeState() {
+            if (!Array.isArray(state.categories) || state.categories.length === 0) {
+                state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+            }
+            if (!Array.isArray(state.transactions)) {
+                state.transactions = INITIAL_TRANSACTIONS.map(t => ({ ...t }));
+            }
+            if (!state.liquidity || typeof state.liquidity !== 'object') {
+                state.liquidity = {
+                    bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
+                    usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
+                };
+            } else {
+                if (!state.liquidity.bank) state.liquidity.bank = { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 };
+                if (!state.liquidity.usdt) state.liquidity.usdt = { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 };
+            }
+            if (!state.cardsHistoryByMonth || typeof state.cardsHistoryByMonth !== 'object') {
+                state.cardsHistoryByMonth = { '2026-12': BASE_CARDS_CONFIG.map(c => ({ ...c })) };
+            }
+            if (!state.overriddenCardBills || typeof state.overriddenCardBills !== 'object') {
+                state.overriddenCardBills = {};
+            }
+            if (!state.cocoGoal || typeof state.cocoGoal !== 'object') {
+                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
+            }
+            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
+                state.cocoGoal.paymentsByMonth = {};
+            }
+            if (!Array.isArray(state.loans)) {
+                state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
+            }
+            if (!Array.isArray(state.roadmapExtras) || state.roadmapExtras.length === 0) {
+                state.roadmapExtras = DEFAULT_ROADMAP_EXTRAS.map(r => ({ ...r }));
+            }
+            const rate = Number(state.usdToArsRate);
+            state.usdToArsRate = (!isNaN(rate) && rate > 0) ? rate : 1200;
+            state.displayCurrency = state.displayCurrency === 'USD' ? 'USD' : 'ARS';
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    state = { ...state, ...parsed };
+                }
+                normalizeState();
+            } catch (err) {
+                console.error('Error cargando estado:', err);
+                normalizeState();
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (err) {
+                console.error('Error guardando estado:', err);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const colors = {
+                success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
+                error: 'bg-rose-950/95 border-rose-500/40 text-rose-200',
+                info: 'bg-zinc-900/95 border-zinc-700 text-zinc-200'
+            };
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl backdrop-blur-md transition-all ${colors[type] || colors.info}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 250);
+            }, 2600);
+        }
+
+        // =====================================================================
+        // FORMATTERS & HELPERS
+        // =====================================================================
+        function formatARS(amount) {
+            const val = Number(amount) || 0;
+            const sign = val < 0 ? '-' : '';
+            const formatted = Math.abs(Math.round(val)).toLocaleString('es-AR');
+            return `${sign}$ ${formatted}`;
+        }
+
+        function formatUSD(amount) {
+            const val = Number(amount) || 0;
+            const sign = val < 0 ? '-' : '';
+            const formatted = Math.abs(val).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            return `${sign}USD ${formatted}`;
+        }
+
+        function formatMoney(amountInArs) {
+            if (state.displayCurrency === 'USD') {
+                const rate = Math.max(1, Number(state.usdToArsRate) || 1200);
+                return formatUSD((Number(amountInArs) || 0) / rate);
+            }
+            return formatARS(amountInArs);
+        }
+
+        function getCategoryById(catId) {
+            return state.categories.find(c => c.id === catId) || { id: 'cat_otros', name: 'Otros', color: '#71717a' };
+        }
+
         function getCurrentMonthPrefix() {
-            const m = String(state.currentMonth + 1).padStart(2, '0');
-            return `${state.currentYear}-${m}`;
+            return `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, '0')}`;
         }
 
         function getPrevYearMonth(year, month) {
@@ -997,9 +1083,23 @@
             return month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 };
         }
 
+        function setDisplayCurrency(curr) {
+            state.displayCurrency = curr === 'USD' ? 'USD' : 'ARS';
+            saveState();
+            renderAll();
+        }
+
+        function syncCocoGoalTotalPaid() {
+            const payments = state.cocoGoal?.paymentsByMonth || {};
+            const sumFromMonths = Object.values(payments).reduce((acc, v) => acc + Math.max(0, Number(v) || 0), 0);
+            state.cocoGoal.paid = Math.round(sumFromMonths * 100) / 100;
+        }
+
+        // =====================================================================
+        // CARDS & COCÓ CALCULATIONS
+        // =====================================================================
         function getCardsForMonth(year, month) {
             const key = `${year}-${String(month + 1).padStart(2, '0')}`;
-            if (!state.cardsHistoryByMonth) state.cardsHistoryByMonth = {};
             if (!state.cardsHistoryByMonth[key]) {
                 state.cardsHistoryByMonth[key] = BASE_CARDS_CONFIG.map(c => ({ ...c }));
             }
@@ -1019,7 +1119,7 @@
         function getProjectedCardItemsForMonth(year, month) {
             const prev = getPrevYearMonth(year, month);
             const prevKey = `${prev.year}-${String(prev.month + 1).padStart(2, '0')}`;
-            const prevCards = (state.cardsHistoryByMonth && state.cardsHistoryByMonth[prevKey]) || [];
+            const prevCards = state.cardsHistoryByMonth[prevKey] || [];
             const fourthBiz = getFourthBusinessDayOfMonth(year, month);
             const overrides = state.overriddenCardBills || {};
 
@@ -1052,209 +1152,84 @@
 
         function getCocoExpenseItemForMonth(year, month) {
             const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
-            const paymentsMap = (state.cocoGoal && state.cocoGoal.paymentsByMonth) || {};
+            const paymentsMap = state.cocoGoal?.paymentsByMonth || {};
             const usdPaidThisMonth = Math.max(0, Number(paymentsMap[monthKey]) || 0);
             if (usdPaidThisMonth <= 0) return null;
 
             const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
             const arsAmount = Math.round(usdPaidThisMonth * usdRate);
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            const dayNum = (today.getFullYear() === year && today.getMonth() === month)
-                ? Math.min(daysInMonth, today.getDate())
-                : Math.min(daysInMonth, 15);
-            const dateStr = `${monthKey}-${String(dayNum).padStart(2, '0')}`;
-
             return {
                 id: `auto_coco_${monthKey}`,
                 monthKey,
-                date: dateStr,
+                usdAmount: usdPaidThisMonth,
+                date: `${monthKey}-28`,
                 type: 'expense',
-                title: `${state.cocoGoal.title || 'Devolución a Cocó'} (${formatUSD(usdPaidThisMonth)} · cotiz. ${formatARS(usdRate)})`,
+                title: `Devolución a Cocó (${formatUSD(usdPaidThisMonth)})`,
                 amount: arsAmount,
-                usdPaid: usdPaidThisMonth,
                 category: 'cat_coco',
                 status: 'completed',
-                notes: 'Egreso automático por devolución a Cocó',
+                notes: `${formatUSD(usdPaidThisMonth)} × $${usdRate} = ${formatARS(arsAmount)}`,
                 isAutoCocoPayment: true
             };
         }
 
-        function syncCocoGoalTotalPaid() {
-            if (!state.cocoGoal) {
-                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
-            }
-            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
-                state.cocoGoal.paymentsByMonth = {};
-            }
-            const totalPaid = Object.values(state.cocoGoal.paymentsByMonth).reduce((sum, v) => sum + Math.max(0, Number(v) || 0), 0);
-            state.cocoGoal.paid = Math.round(totalPaid * 100) / 100;
-        }
-
-        function normalizeState() {
-            if (!Array.isArray(state.categories) || state.categories.length === 0) {
-                state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
-            }
-            if (!state.categories.some(c => c.id === 'cat_coco')) {
-                state.categories.push({ id: 'cat_coco', name: 'Devolución Cocó', color: '#ec4899' });
-            }
-            if (!Array.isArray(state.transactions)) {
-                state.transactions = INITIAL_TRANSACTIONS.map(t => ({ ...t }));
-            }
-            if (!state.usdToArsRate || Number(state.usdToArsRate) <= 0) {
-                state.usdToArsRate = 1200;
-            }
-            if (!state.liquidity || !state.liquidity.bank || !state.liquidity.usdt) {
-                state.liquidity = {
-                    bank: { name: 'Saldo en Cuenta Bancaria', amount: 1800000, refMax: 2500000 },
-                    usdt: { name: 'Saldo en USDT (en Pesos)', amount: 0, refMax: 2500 }
-                };
-            }
-            if (!state.cardsHistoryByMonth || typeof state.cardsHistoryByMonth !== 'object') {
-                state.cardsHistoryByMonth = {
-                    '2026-12': BASE_CARDS_CONFIG.map(c => ({ ...c }))
-                };
-            }
-            if (!state.overriddenCardBills || typeof state.overriddenCardBills !== 'object') {
-                state.overriddenCardBills = {};
-            }
-            if (!state.cocoGoal || typeof state.cocoGoal !== 'object') {
-                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
-            }
-            if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
-                state.cocoGoal.paymentsByMonth = {};
-                const initialPaid = Math.max(0, Number(state.cocoGoal.paid) || 0);
-                if (initialPaid > 0) {
-                    state.cocoGoal.paymentsByMonth[getCurrentMonthPrefix()] = initialPaid;
-                }
-            }
-            if (!Array.isArray(state.loans)) {
-                state.loans = DEFAULT_LOANS_LIST.map(l => ({ ...l }));
-            }
-            if (!Array.isArray(state.roadmapExtras) || state.roadmapExtras.length === 0) {
-                state.roadmapExtras = DEFAULT_ROADMAP_EXTRAS.map(r => ({ ...r }));
-            }
-        }
-
-        function loadState() {
-            try {
-                let raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) {
-                    for (const oldKey of LEGACY_STORAGE_KEYS) {
-                        const legacy = localStorage.getItem(oldKey);
-                        if (legacy) {
-                            raw = legacy;
-                            break;
-                        }
-                    }
-                }
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    state = { ...state, ...parsed };
-                }
-            } catch (e) {
-                console.warn('Error leyendo localStorage:', e);
-            }
-            normalizeState();
-            saveState();
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (e) {
-                console.error('Error guardando estado:', e);
-            }
-        }
-
-        // =====================================================================
-        // FORMATTING HELPERS
-        // =====================================================================
-        function formatARS(num) {
-            const val = Math.round(Number(num) || 0);
-            const sign = val < 0 ? '-' : '';
-            return `${sign}$ ${Math.abs(val).toLocaleString('es-AR')}`;
-        }
-
-        function formatUSD(num) {
-            const val = Number(num) || 0;
-            return `USD ${val.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-        }
-
-        function getCategoryById(id) {
-            return state.categories.find(c => c.id === id) || { id: 'cat_otros', name: 'Otros', color: '#71717a' };
-        }
-
-        function showToast(msg, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const colors = {
-                success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
-                error: 'bg-rose-950/95 border-rose-500/40 text-rose-200',
-                info: 'bg-zinc-900/95 border-zinc-700 text-zinc-200'
-            };
-            const el = document.createElement('div');
-            el.className = `pointer-events-auto px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl backdrop-blur-md transition-all duration-300 ${colors[type] || colors.info}`;
-            el.textContent = msg;
-            container.appendChild(el);
-            setTimeout(() => {
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 300);
-            }, 3000);
-        }
-
-        // =====================================================================
-        // DATA QUERIES FOR CURRENT MONTH
-        // =====================================================================
-        function getMonthTransactions() {
-            const prefix = getCurrentMonthPrefix();
-            const cocoItem = getCocoExpenseItemForMonth(state.currentYear, state.currentMonth);
-            let list = [];
-            if (state.currentYear === 2026 && state.currentMonth === 11) {
-                list = state.transactions.filter(tx =>
-                    tx.date.startsWith('2026-12') || (tx.date >= '2026-11-20' && tx.date <= '2026-11-30')
-                );
-            } else {
-                list = state.transactions.filter(tx => tx.date.startsWith(prefix));
-            }
-            return cocoItem ? [...list, cocoItem] : list;
-        }
-
-        function getAllMonthExpensesIncludingCards(year, month) {
+        function getMonthTransactions(year = state.currentYear, month = state.currentMonth) {
             const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
-            let baseList = [];
-            if (year === 2026 && month === 11) {
-                baseList = state.transactions.filter(tx =>
-                    tx.date.startsWith('2026-12') || (tx.date >= '2026-11-20' && tx.date <= '2026-11-30')
-                );
-            } else {
-                baseList = state.transactions.filter(tx => tx.date.startsWith(prefix));
-            }
-            const projectedCards = getProjectedCardItemsForMonth(year, month);
+            const baseTxs = state.transactions.filter(tx => {
+                if (tx.date.startsWith(prefix)) return true;
+                // Puente última semana de Noviembre dentro de Diciembre 2026
+                if (year === 2026 && month === 11 && tx.date >= '2026-11-23' && tx.date <= '2026-11-30') {
+                    return true;
+                }
+                return false;
+            });
+
             const cocoItem = getCocoExpenseItemForMonth(year, month);
-            return [...baseList, ...projectedCards, ...(cocoItem ? [cocoItem] : [])];
+            return cocoItem ? [...baseTxs, cocoItem] : baseTxs;
+        }
+
+        function getAllMonthExpensesIncludingCards(year = state.currentYear, month = state.currentMonth) {
+            const txs = getMonthTransactions(year, month);
+            const projectedCards = getProjectedCardItemsForMonth(year, month);
+            return [...txs, ...projectedCards];
         }
 
         // =====================================================================
-        // RENDER: TOP HEADER & KPIS
+        // RENDER: HEADER & KPI CARDS
         // =====================================================================
         function renderHeader() {
             const dateObj = new Date(state.currentYear, state.currentMonth, 1);
-            const label = dateObj.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
-            document.getElementById('currentMonthLabel').textContent = label;
-            document.getElementById('usdRateInput').value = state.usdToArsRate;
+            const monthLabel = dateObj.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+            document.getElementById('currentMonthLabel').textContent = monthLabel;
+
+            const usdInput = document.getElementById('usdRateInput');
+            if (document.activeElement !== usdInput) {
+                usdInput.value = state.usdToArsRate;
+            }
+
+            const arsBtn = document.getElementById('currencyArsBtn');
+            const usdBtn = document.getElementById('currencyUsdBtn');
+            if (state.displayCurrency === 'USD') {
+                usdBtn.className = 'px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-semibold';
+                arsBtn.className = 'px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white font-semibold';
+            } else {
+                arsBtn.className = 'px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-semibold';
+                usdBtn.className = 'px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white font-semibold';
+            }
         }
 
         function renderKPIs() {
-            const allItems = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
+            const items = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
 
             let incomeTotal = 0;
             let incomeCompleted = 0;
             let incomePending = 0;
+
             let expenseTotal = 0;
             let expenseCompleted = 0;
             let expensePending = 0;
 
-            allItems.forEach(item => {
+            items.forEach(item => {
                 const amt = Number(item.amount) || 0;
                 if (item.type === 'income') {
                     incomeTotal += amt;
@@ -1267,22 +1242,33 @@
                 }
             });
 
+            const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
+            const bankBalanceArs = Number(state.liquidity?.bank?.amount) || 0;
+            const usdtBalance = Number(state.liquidity?.usdt?.amount) || 0;
+            const usdtBalanceArs = usdtBalance * usdRate;
+
             const realBalance = incomeCompleted - expenseCompleted;
-            const projectedBalance = incomeTotal - expenseTotal;
+            // Proyección Cierre de Mes = Cuenta Bancaria + USDT (en pesos) + Ingresos del Mes - Egresos del Mes
+            const projectedBalance = bankBalanceArs + usdtBalanceArs + incomeTotal - expenseTotal;
 
-            document.getElementById('kpiIncomeTotal').textContent = formatARS(incomeTotal);
-            document.getElementById('kpiIncomeBreakdown').textContent = `Cobrado: ${formatARS(incomeCompleted)} · Pendiente: ${formatARS(incomePending)}`;
+            document.getElementById('kpiIncomeTotal').textContent = formatMoney(incomeTotal);
+            document.getElementById('kpiIncomeBreakdown').textContent = `Cobrado: ${formatMoney(incomeCompleted)} · Pendiente: ${formatMoney(incomePending)}`;
 
-            document.getElementById('kpiExpenseTotal').textContent = formatARS(expenseTotal);
-            document.getElementById('kpiExpenseBreakdown').textContent = `Pagado: ${formatARS(expenseCompleted)} · Pendiente: ${formatARS(expensePending)}`;
+            document.getElementById('kpiExpenseTotal').textContent = formatMoney(expenseTotal);
+            document.getElementById('kpiExpenseBreakdown').textContent = `Pagado: ${formatMoney(expenseCompleted)} · Pendiente: ${formatMoney(expensePending)}`;
 
             const realEl = document.getElementById('kpiRealBalance');
-            realEl.textContent = formatARS(realBalance);
+            realEl.textContent = formatMoney(realBalance);
             realEl.className = `text-2xl font-bold font-mono tabular-nums ${realBalance >= 0 ? 'text-white' : 'text-rose-400'}`;
 
             const projEl = document.getElementById('kpiProjectedBalance');
-            projEl.textContent = formatARS(projectedBalance);
+            projEl.textContent = formatMoney(projectedBalance);
             projEl.className = `text-2xl font-bold font-mono tabular-nums ${projectedBalance >= 0 ? 'text-amber-300' : 'text-rose-400'}`;
+
+            const projBreakdownEl = document.getElementById('kpiProjectedBreakdown');
+            if (projBreakdownEl) {
+                projBreakdownEl.textContent = `Banco ${formatMoney(bankBalanceArs)} + USDT ${formatMoney(usdtBalanceArs)} + Ing ${formatMoney(incomeTotal)} - Egr ${formatMoney(expenseTotal)}`;
+            }
         }
 
         // =====================================================================
@@ -1352,12 +1338,12 @@
                         const itemsList = g.items.map(it => {
                             const day = it.date.split('-')[2];
                             const statusBadge = it.isAutoCardEstimate
-                                ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300">Auto mes ant.</span>'
+                                ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300">Auto mes ant.</span>'
                                 : it.isAutoCocoPayment
-                                    ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-pink-500/15 text-pink-300">Devolución Cocó</span>'
+                                    ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-pink-500/15 text-pink-300">Devolución Cocó</span>'
                                     : it.status === 'completed'
-                                        ? '<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300">Efectivizado</span>'
-                                        : '<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-300">Pendiente</span>';
+                                        ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Efectivizado</span>'
+                                        : '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300">Pendiente</span>';
 
                             const safeTitle = String(it.title || '').replace(/'/g, "\\'");
                             const editActionAttr = it.isAutoCardEstimate
@@ -1403,7 +1389,7 @@
                                         ${g.cat.name}
                                     </span>
                                     <span class="text-xs font-mono font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">
-                                        ${formatARS(g.total)} <span class="text-zinc-500 font-normal">(${pct}%)</span>
+                                        ${formatMoney(g.total)} <span class="text-zinc-500 font-normal">(${pct}%)</span>
                                     </span>
                                 </div>
                                 <div class="space-y-0.5">${itemsList}</div>
@@ -1415,7 +1401,7 @@
                         <div class="space-y-3">
                             <div class="flex items-center justify-between px-1">
                                 <span class="text-xs font-bold uppercase tracking-wider ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${title}</span>
-                                <span class="text-sm font-mono font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${formatARS(total)}</span>
+                                <span class="text-sm font-mono font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">${formatMoney(total)}</span>
                             </div>
                             ${groupsHtml || `<p class="text-xs text-zinc-500 italic px-1">Sin registros en este mes.</p>`}
                         </div>
@@ -1458,7 +1444,7 @@
                                     <span class="w-2 h-2 rounded-full" style="background-color: ${entry.cat.color}"></span>
                                     ${entry.cat.name}
                                 </span>
-                                <span class="font-mono text-zinc-200">${formatARS(entry.total)} <span class="text-zinc-500">(${pct}%)</span></span>
+                                <span class="font-mono text-zinc-200">${formatMoney(entry.total)} <span class="text-zinc-500">(${pct}%)</span></span>
                             </div>
                             <div class="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden">
                                 <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${entry.cat.color}"></div>
@@ -1482,7 +1468,6 @@
 
         function overrideAutoCardEstimate(cardId, sourceMonthKey, dateStr, title, rawValue) {
             const parsed = Math.max(0, parseFloat(rawValue) || 0);
-            if (!state.overriddenCardBills) state.overriddenCardBills = {};
             state.overriddenCardBills[`${sourceMonthKey}_${cardId}`] = parsed;
             saveState();
             renderAll();
@@ -1499,7 +1484,6 @@
         function updateCocoPaymentFromBreakdown(monthKey, rawArsValue) {
             const parsedArs = Math.max(0, parseFloat(rawArsValue) || 0);
             const usdRate = Math.max(1, Number(state.usdToArsRate) || 1200);
-            if (!state.cocoGoal.paymentsByMonth) state.cocoGoal.paymentsByMonth = {};
             state.cocoGoal.paymentsByMonth[monthKey] = Math.round((parsedArs / usdRate) * 100) / 100;
             syncCocoGoalTotalPaid();
             saveState();
@@ -1516,20 +1500,21 @@
             // Cuenta Bancaria
             const bank = state.liquidity.bank;
             document.getElementById('bankNameLabel').textContent = bank.name;
-            document.getElementById('bankAmountLabel').textContent = formatARS(bank.amount);
-            document.getElementById('bankRefLabel').textContent = `Ref: ${formatARS(bank.refMax)}`;
+            document.getElementById('bankAmountLabel').textContent = formatMoney(bank.amount);
+            document.getElementById('bankRefLabel').textContent = `Ref: ${formatMoney(bank.refMax)}`;
             const bankPct = bank.refMax > 0 ? Math.min(100, Math.max(0, (bank.amount / bank.refMax) * 100)) : 0;
             document.getElementById('bankProgressBar').style.width = `${bankPct}%`;
 
             // Saldo en USDT + Conversión en Pesos
             const usdt = state.liquidity.usdt;
-            const usdtInArs = (Number(usdt.amount) || 0) * usdRate;
+            const usdtAmount = Number(usdt.amount) || 0;
+            const usdtInArs = usdtAmount * usdRate;
             document.getElementById('usdtNameLabel').textContent = usdt.name;
             document.getElementById('usdtSubRateLabel').textContent = `Manual · Cotiz. ${formatARS(usdRate)}`;
             document.getElementById('usdtArsAmountLabel').textContent = formatARS(usdtInArs);
-            document.getElementById('usdtAmountLabel').textContent = `${(Number(usdt.amount) || 0).toLocaleString('es-AR')} USDT`;
+            document.getElementById('usdtAmountLabel').textContent = `${usdtAmount.toLocaleString('es-AR')} USDT`;
             document.getElementById('usdtRefLabel').textContent = `Ref: ${(Number(usdt.refMax) || 2500).toLocaleString('es-AR')} USDT`;
-            const usdtPct = usdt.refMax > 0 ? Math.min(100, Math.max(0, (usdt.amount / usdt.refMax) * 100)) : 0;
+            const usdtPct = usdt.refMax > 0 ? Math.min(100, Math.max(0, (usdtAmount / usdt.refMax) * 100)) : 0;
             document.getElementById('usdtProgressBar').style.width = `${usdtPct}%`;
 
             // 4 Tarjetas del mes activo
@@ -1589,7 +1574,7 @@
 
         function setGlobalCardTax(rate) {
             const cards = getCardsForMonth(state.currentYear, state.currentMonth);
-            cards.forEach(c => c.taxRate = rate);
+            cards.forEach(c => { c.taxRate = rate; });
             saveState();
             renderAll();
             showToast(`Taxes estimados de tarjetas ajustados a ${rate}%`, 'info');
@@ -1616,9 +1601,6 @@
 
         function adjustCocoPaid(delta) {
             const monthKey = getCurrentMonthPrefix();
-            if (!state.cocoGoal) {
-                state.cocoGoal = { title: 'Devolución a Cocó', paid: 0, target: 2500, paymentsByMonth: {} };
-            }
             if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
                 state.cocoGoal.paymentsByMonth = {};
             }
@@ -1661,7 +1643,6 @@
             const summaryGrid = document.getElementById('loansLiveSummaryGrid');
             const tbody = document.getElementById('roadmapTableBody');
 
-            // Resumen vivo de préstamos
             if (state.loans.length === 0) {
                 summaryGrid.innerHTML = `<div class="col-span-full text-xs text-zinc-500 italic bg-zinc-950/70 border border-zinc-800 rounded-xl p-3">Sin préstamos activos en la hoja de ruta.</div>`;
             } else {
@@ -1672,12 +1653,12 @@
                             <div>
                                 <div class="text-xs font-bold text-white">${loan.name}</div>
                                 <div class="text-[11px] text-zinc-400 mt-0.5">
-                                    Dic 26: <span class="text-indigo-300 font-mono">Cuota ${decSnap.installmentNumber}/${decSnap.totalInstallments}</span> · ${formatARS(loan.installmentAmount)}/mes
+                                    Dic 26: <span class="text-indigo-300 font-mono">Cuota ${decSnap.installmentNumber}/${decSnap.totalInstallments}</span> · ${formatMoney(loan.installmentAmount)}/mes
                                 </div>
                             </div>
                             <div class="text-right">
                                 <span class="text-[10px] text-zinc-500 block">Saldo tras Dic</span>
-                                <span class="text-xs font-bold font-mono text-rose-400">${formatARS(decSnap.remainingBalance)}</span>
+                                <span class="text-xs font-bold font-mono text-rose-400">${formatMoney(decSnap.remainingBalance)}</span>
                             </div>
                         </div>
                     `;
@@ -1690,11 +1671,10 @@
                     const snap = getLoanSnapshotForMonthOffset(loan, row.monthIndex);
                     totalLoansRemaining += snap.remainingBalance;
                     return snap.active
-                        ? `<div class="text-[11px] text-zinc-300">${loan.name}: <span class="text-indigo-300">cta ${snap.installmentNumber}/${snap.totalInstallments}</span> (${formatARS(snap.remainingBalance)})</div>`
-                        : `<div class="text-[11px] text-emerald-400">${loan.name}: Cancelado ($ 0)</div>`;
+                        ? `<div class="text-[11px] text-zinc-300">${loan.name}: <span class="text-indigo-300">cta ${snap.installmentNumber}/${snap.totalInstallments}</span> (${formatMoney(snap.remainingBalance)})</div>`
+                        : `<div class="text-[11px] text-emerald-400">${loan.name}: Cancelado (${formatMoney(0)})</div>`;
                 }).join('');
 
-                // Tarjetas mes a mes calculadas desde el historial de las 4 barritas o los vencimientos del mes
                 const monthCards = getCardsForMonth(row.year, row.month);
                 const cardsUsedPlusTax = monthCards.reduce((sum, c) => sum + computeCardEstimate(c).nextBill, 0);
                 const rowCardsDebt = row.monthIndex === 0
@@ -1708,13 +1688,13 @@
                     <tr onclick="openRoadmapRowModal(${idx})" class="cursor-pointer hover:bg-zinc-800/50 transition-colors">
                         <td class="py-3 px-3 font-sans font-semibold text-white">${row.label}</td>
                         <td class="py-3 px-3 text-right">
-                            <div class="font-bold text-rose-400">${formatARS(totalLoansRemaining)}</div>
+                            <div class="font-bold text-rose-400">${formatMoney(totalLoansRemaining)}</div>
                             ${loanBadges}
                         </td>
-                        <td class="py-3 px-3 text-right text-violet-300">${formatARS(rowCardsDebt)}</td>
-                        <td class="py-3 px-3 text-right text-pink-300">${formatARS(cocoDebt)}</td>
-                        <td class="py-3 px-3 text-right font-bold text-amber-300">${formatARS(totalConsolidatedDebt)}</td>
-                        <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatARS(row.netSaved)}</td>
+                        <td class="py-3 px-3 text-right text-violet-300">${formatMoney(rowCardsDebt)}</td>
+                        <td class="py-3 px-3 text-right text-pink-300">${formatMoney(cocoDebt)}</td>
+                        <td class="py-3 px-3 text-right font-bold text-amber-300">${formatMoney(totalConsolidatedDebt)}</td>
+                        <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatMoney(row.netSaved)}</td>
                     </tr>
                 `;
             }).join('');
@@ -1731,12 +1711,11 @@
 
             const isDec2026Bridge = (year === 2026 && month === 11);
             bridgeNote.textContent = isDec2026Bridge
-                ? 'Incluye la última semana de Noviembre (Regalo Lela + OWA) conectada con Diciembre 2026. Clic en cualquier día para editar.'
+                ? 'Incluye la última semana de Noviembre (Regalo Lela $170.000 + OWA $250.000) conectada con Diciembre 2026.'
                 : 'Clic en cualquier día para agregar o editar ingresos, egresos o vencimientos.';
 
             const firstDayOfMonth = new Date(year, month, 1);
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            // Lunes = 0 ... Domingo = 6
             const startWeekday = (firstDayOfMonth.getDay() + 6) % 7;
 
             const prevYM = getPrevYearMonth(year, month);
@@ -1747,7 +1726,6 @@
 
             const cells = [];
 
-            // Días previos (puente de Noviembre visible si estamos en Dic 2026, o relleno suave)
             for (let i = startWeekday - 1; i >= 0; i--) {
                 const prevDay = daysInPrevMonth - i;
                 const dateStr = `${prevYM.year}-${String(prevYM.month + 1).padStart(2, '0')}-${String(prevDay).padStart(2, '0')}`;
@@ -1761,7 +1739,6 @@
                 });
             }
 
-            // Días del mes actual
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayItems = allMonthItems.filter(t => t.date === dateStr);
@@ -1774,7 +1751,6 @@
                 });
             }
 
-            // Completar fila final hasta múltiplo de 7
             const nextYM = getNextYearMonth(year, month);
             let nextDayCounter = 1;
             while (cells.length % 7 !== 0) {
@@ -1809,7 +1785,7 @@
                     }
 
                     return `
-                        <div class="px-1.5 py-0.5 rounded border text-[10px] font-medium truncate ${pillClass}" title="${item.title}: ${formatARS(item.amount)}">
+                        <div class="px-1.5 py-0.5 rounded border text-[10px] font-medium truncate ${pillClass}" title="${item.title}: ${formatMoney(item.amount)}">
                             ${item.type === 'income' ? '+' : '-'}${Math.round((Number(item.amount) || 0) / 1000)}k ${item.title}
                         </div>
                     `;
@@ -1870,7 +1846,7 @@
                                 </div>
                                 <span class="text-[10px] text-zinc-400 block mt-0.5">Utilizado: ${formatARS(item.used)} + ${item.taxRate}% taxes (4to día hábil)</span>
                             </div>
-                            <span class="text-xs font-bold font-mono text-indigo-300 shrink-0">-${formatARS(item.amount)}</span>
+                            <span class="text-xs font-bold font-mono text-indigo-300 shrink-0">-${formatMoney(item.amount)}</span>
                         </div>
                     `;
                 }
@@ -1888,7 +1864,7 @@
                                     <span class="text-emerald-400">Efectivizado · Restado del saldo del mes</span>
                                 </div>
                             </div>
-                            <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatARS(item.amount)}</span>
+                            <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatMoney(item.amount)}</span>
                         </div>
                     `;
                 }
@@ -1910,7 +1886,7 @@
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
                             <span class="text-xs font-bold font-mono ${item.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${item.type === 'income' ? '+' : '-'}${formatARS(item.amount)}
+                                ${item.type === 'income' ? '+' : '-'}${formatMoney(item.amount)}
                             </span>
                             <button type="button" onclick="toggleTransactionStatus('${item.id}')" class="p-1.5 rounded-lg border ${isCompleted ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-300'}" title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como cobrado/pagado'}">
                                 <i data-lucide="check" class="w-3 h-3"></i>
@@ -1942,7 +1918,6 @@
             const prefix = getCurrentMonthPrefix();
             const allItems = getAllMonthExpensesIncludingCards(state.currentYear, state.currentMonth);
 
-            // Saldo inicial del puente de Noviembre si estamos en Diciembre 2026
             let running = 0;
             if (state.currentYear === 2026 && state.currentMonth === 11) {
                 allItems.filter(t => t.date < '2026-12-01').forEach(t => {
@@ -1987,7 +1962,7 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: (context) => formatARS(context.parsed.y)
+                                label: (context) => formatMoney(context.parsed.y)
                             }
                         }
                     },
@@ -2010,7 +1985,7 @@
         }
 
         // =====================================================================
-        // MODALS: MANUAL BARS (BANK / USDT / CARDS)
+        // MODALS: MANUAL BARS, COCÓ, LOANS, ROADMAP ROW, CATEGORIES, DAY
         // =====================================================================
         function updateManualBarCardPreview() {
             const limit = Math.max(0, parseFloat(document.getElementById('mbLimit').value) || 0);
@@ -2068,9 +2043,6 @@
             document.getElementById('manualBarModal').classList.add('hidden');
         }
 
-        // =====================================================================
-        // MODALS: COCÓ, LOANS, ROADMAP ROW, CATEGORIES, DAY
-        // =====================================================================
         function openCocoModal() {
             document.getElementById('cocoTitleInput').value = state.cocoGoal.title || 'Devolución a Cocó';
             document.getElementById('cocoPaidInput').value = state.cocoGoal.paid || 0;
@@ -2274,7 +2246,7 @@
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
                             <span class="text-xs font-bold font-mono ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${tx.type === 'income' ? '+' : '-'}${formatARS(tx.amount)}
+                                ${tx.type === 'income' ? '+' : '-'}${formatMoney(tx.amount)}
                             </span>
                             <button type="button" onclick="editTransactionInDayModal('${tx.id}')" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white" title="Editar">
                                 <i data-lucide="pencil" class="w-3 h-3"></i>
@@ -2293,7 +2265,7 @@
                         <span class="text-xs font-semibold text-pink-200 block truncate">${cItem.title}</span>
                         <span class="text-[10px] text-zinc-400">Devolución a Cocó · Restado del cierre mensual</span>
                     </div>
-                    <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatARS(cItem.amount)}</span>
+                    <span class="text-xs font-bold font-mono text-rose-400 shrink-0">-${formatMoney(cItem.amount)}</span>
                 </div>
             `).join('');
 
@@ -2303,7 +2275,7 @@
                         <span class="text-xs font-semibold text-indigo-200 block truncate">${est.title}</span>
                         <span class="text-[10px] text-zinc-400">Calculado automáticamente (4to día hábil)</span>
                     </div>
-                    <span class="text-xs font-bold font-mono text-indigo-300 shrink-0">-${formatARS(est.amount)}</span>
+                    <span class="text-xs font-bold font-mono text-indigo-300 shrink-0">-${formatMoney(est.amount)}</span>
                 </div>
             `).join('');
 
@@ -2328,7 +2300,6 @@
         }
 
         function setupEventListeners() {
-            // Navegación de meses
             document.getElementById('prevMonthBtn').addEventListener('click', () => {
                 const prev = getPrevYearMonth(state.currentYear, state.currentMonth);
                 state.currentYear = prev.year;
@@ -2345,7 +2316,6 @@
                 renderAll();
             });
 
-            // Cotización USD/USDT editable en tiempo real
             document.getElementById('usdRateInput').addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
                 if (!isNaN(val) && val > 0) {
@@ -2355,7 +2325,6 @@
                 }
             });
 
-            // Toggle Hoja de Ruta
             document.getElementById('toggleRoadmapBtn').addEventListener('click', () => {
                 const sec = document.getElementById('roadmapSection');
                 const chev = document.getElementById('roadmapChevron');
@@ -2363,7 +2332,6 @@
                 chev.style.transform = sec.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
             });
 
-            // Filtros de lista lateral
             document.querySelectorAll('.filter-chip').forEach(btn => {
                 btn.addEventListener('click', () => {
                     state.filter = btn.dataset.filter;
@@ -2377,7 +2345,6 @@
                 });
             });
 
-            // Preview vivo en modal de tarjetas
             ['mbAmount', 'mbLimit', 'mbTaxRate'].forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
                     if (document.getElementById('mbGroup').value === 'card') {
@@ -2386,7 +2353,6 @@
                 });
             });
 
-            // Guardar barra manual (liquidez o tarjeta)
             document.getElementById('manualBarForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const group = document.getElementById('mbGroup').value;
@@ -2414,7 +2380,6 @@
                 showToast('Saldo actualizado correctamente', 'success');
             });
 
-            // Guardar objetivo Cocó (y descontar diferencia en el saldo final del mes activo)
             document.getElementById('cocoForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (!state.cocoGoal.paymentsByMonth || typeof state.cocoGoal.paymentsByMonth !== 'object') {
@@ -2442,7 +2407,6 @@
                 showToast(`Cocó actualizado: -${formatARS(arsMonthTotal)} descontados en este mes`, 'success');
             });
 
-            // Agregar nuevo préstamo
             document.getElementById('addLoanForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('newLoanName').value.trim();
@@ -2464,7 +2428,6 @@
                 showToast('Préstamo agregado a la hoja de ruta', 'success');
             });
 
-            // Guardar fila hoja de ruta
             document.getElementById('roadmapRowForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const idx = parseInt(document.getElementById('rmRowIndex').value, 10);
@@ -2478,7 +2441,6 @@
                 showToast('Fila actualizada', 'success');
             });
 
-            // Categorías
             document.getElementById('openCategoriesBtn').addEventListener('click', openCategoriesModal);
             document.getElementById('newCategoryForm').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -2492,7 +2454,6 @@
                 showToast('Categoría creada', 'success');
             });
 
-            // Formulario de movimiento en día
             document.getElementById('txForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const txId = document.getElementById('txId').value;
@@ -2547,7 +2508,6 @@
                 renderAll();
             });
 
-            // Exportar JSON
             document.getElementById('exportJsonBtn').addEventListener('click', () => {
                 const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -2559,7 +2519,6 @@
                 showToast('Respaldo JSON descargado', 'success');
             });
 
-            // Importar JSON
             document.getElementById('importJsonInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -2580,12 +2539,12 @@
                 e.target.value = '';
             });
 
-            // Restaurar datos base
             document.getElementById('resetSheetBtn').addEventListener('click', () => {
                 localStorage.removeItem(STORAGE_KEY);
                 state = {
                     currentYear: 2026,
                     currentMonth: 11,
+                    displayCurrency: 'ARS',
                     usdToArsRate: 1200,
                     filter: 'all',
                     breakdownOpen: false,
